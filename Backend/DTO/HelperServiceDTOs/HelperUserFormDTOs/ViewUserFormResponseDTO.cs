@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿﻿using System.ComponentModel.DataAnnotations;
 
 /// <summary>
 /// DTO for the comprehensive view of a single patient form (as required by hsp_ViewUserForm).
@@ -11,7 +11,7 @@ public class ViewUserFormResponseDTO
     [Required]
     public string IssueType { get; set; } = string.Empty;
 
-    public string? IssueDescryption { get; set; }
+    public string? IssueDescription { get; set; }
 
     [Required]
     [MaxLength(10)]

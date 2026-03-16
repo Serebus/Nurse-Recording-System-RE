@@ -2,10 +2,10 @@
 {
     public class AppointmentScheduleModel
     {
-        public int MyProperty { get; set; }
-        public DateTime MyProperty1 { get; set; }
-        public string MyProperty2 { get; set; } = null!;
-        public int MyProperty3 { get; set; }
+        public int ScheduleId { get; set; }
+        public DateTime AppointmentDate { get; set; }
+        public string Description { get; set; } = null!;
+        public int PatientId { get; set; }
 
     }
 }

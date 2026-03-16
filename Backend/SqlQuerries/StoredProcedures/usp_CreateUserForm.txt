@@ -11,7 +11,7 @@ GO
 
 CREATE PROCEDURE [dbo].[usp_CreateUserForm]
 	@IssueType NVARCHAR(MAX),
-	@IssueDescryption NVARCHAR(MAX),
+	@IssueDescription NVARCHAR(MAX),
 	@Status NVARCHAR(10), 
 	@UserId INT,
 	@PatientName NVARCHAR(MAX),
@@ -27,7 +27,7 @@ BEGIN
 	INSERT INTO [PatientForms]
 		(
             issueType, 
-            issueDescryption, 
+            issueDescription, 
             status, 
             userId, 
             patientName, 
@@ -40,7 +40,7 @@ BEGIN
     VALUES 
 		(
             @IssueType, 
-            @IssueDescryption, 
+            @IssueDescription, 
             @Status, 
             @UserId, 
             @PatientName, 
@@ -56,5 +56,3 @@ BEGIN
     SELECT SCOPE_IDENTITY() AS NewFormId;
 END
 GO
-
-
