@@ -53,6 +53,6 @@ BEGIN
 
     -- This is the new line you need to add.
     -- It selects the 'formId' that was just created.
-    SELECT SCOPE_IDENTITY() AS NewFormId;
+    SELECT CAST(SCOPE_IDENTITY() AS INT) AS NewFormId;
 END
 GO
