@@ -1,0 +1,38 @@
+USE [NurseRecordingSystem]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[usp_CreateFollowUp]
+    @PatientId INT,
+    @RecordId INT,
+    @FollowUpDate DATETIME2,
+    @Description NVARCHAR(MAX),
+    @CreatedBy NVARCHAR(50)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @CurrentTime DATETIME2(7) = SYSUTCDATETIME();
+
+    INSERT INTO [PatientFollowUps] (
+        [patientId], 
+        [recordId], 
+        [followUpDate], 
+        [description], 
+        [createdOn], 
+        [createdBy], 
+        [updatedOn], 
+        [updatedBy], 
+        [isActive]
+    )
+    VALUES (
+        @PatientId, @RecordId, @FollowUpDate, @Description, 
+        @CurrentTime, @CreatedBy, @CurrentTime, @CreatedBy, 1
+    );
+
+    SELECT CAST(SCOPE_IDENTITY() AS INT) AS NewFollowUpId;
+END
+GO

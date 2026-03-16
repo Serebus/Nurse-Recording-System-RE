@@ -1,0 +1,25 @@
+USE [NurseRecordingSystem]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[usp_DeleteFollowUp]
+    @FollowUpId INT,
+    @DeletedBy NVARCHAR(50)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    UPDATE [PatientFollowUps]
+    SET [isActive] = 0,
+        [deletedOn] = SYSUTCDATETIME(),
+        [deletedBy] = @DeletedBy
+    WHERE [followUpId] = @FollowUpId AND [isActive] = 1;
+
+    IF @@ROWCOUNT = 0 
+        THROW 50001, 'Follow-up not found or already deleted.', 1;
+END
+GO
