@@ -6,7 +6,7 @@ services:
       - "8080:8080"
     environment:
       - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Server=db;Database=NurseRecordingSystem;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
+      - ConnectionStrings__DefaultConnection=Server=db;Database=NurseRecordingSystem;User Id=sa;Password=testing;TrustServerCertificate=True
     depends_on:
       - db
   db:
