@@ -26,7 +26,7 @@ namespace NurseRecordingSystem.Test.ControllerTest.HelperControllerTest
             {
                 FormId = formId,
                 IssueType = "Medical",
-                IssueDescryption = "Patient has fever",
+                IssueDescription = "Patient has fever",
                 Status = "Active",
                 UserId = 123,
                 PatientName = "John Doe",

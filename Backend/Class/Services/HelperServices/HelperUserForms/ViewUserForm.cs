@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+﻿﻿using Microsoft.Data.SqlClient;
 using NurseRecordingSystem.Contracts.ServiceContracts.HelperContracts.IHelperUserForm;
 
 namespace NurseRecordingSystem.Class.Services.UserServices.UserForms
@@ -35,7 +35,7 @@ namespace NurseRecordingSystem.Class.Services.UserServices.UserForms
                             {
                                 FormId = reader.GetInt32(reader.GetOrdinal("formId")),
                                 IssueType = reader.GetString(reader.GetOrdinal("issueType")),
-                                IssueDescryption = reader.IsDBNull(reader.GetOrdinal("issueDescryption")) ? null : reader.GetString(reader.GetOrdinal("issueDescryption")),
+                                IssueDescription = reader.IsDBNull(reader.GetOrdinal("issueDescryption")) ? null : reader.GetString(reader.GetOrdinal("issueDescryption")),
                                 Status = reader.GetString(reader.GetOrdinal("status")),
                                 UserId = reader.GetInt32(reader.GetOrdinal("userId")),
                                 PatientName = reader.GetString(reader.GetOrdinal("patientName")),
