@@ -11,7 +11,6 @@ using NurseRecordingSystem.Class.Services.NurseServices.AppointmentSchedules;
 using NurseRecordingSystem.Class.Services.NurseServices.NurseAppointmentSchedules;
 using NurseRecordingSystem.Class.Services.NurseServices.NurseCreation;
 using NurseRecordingSystem.Class.Services.NurseServices.PatientRecords;
-using NurseRecordingSystem.Class.Services.NurseServices.FollowUps;
 using NurseRecordingSystem.Class.Services.UserServices.UserForms;
 using NurseRecordingSystem.Class.Services.UserServices.Users;
 using NurseRecordingSystem.Contracts.ControllerContracts;
@@ -26,7 +25,6 @@ using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INurseClinicStatus;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INurseMedecineStock;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INursePatientRecords;
-using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.IFollowUps;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INurseUserForms;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INurseUsers;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.NurseCreation;
@@ -93,11 +91,6 @@ builder.Services.AddScoped<IViewAppointmentScheduleList, ViewAppointmentSchedule
 builder.Services.AddScoped<IViewAppointmentSchedule, ViewAppointmentSchedule>();
 builder.Services.AddScoped<IUpdateAppointmentSchedule, UpdateAppointmentSchedule>();
 builder.Services.AddScoped<IDeleteAppointmentSchedule, DeleteAppointmentSchedule>();
-
-// Follow-Up Services Registration
-builder.Services.AddScoped<ICreateFollowUp, CreateFollowUp>();
-builder.Services.AddScoped<IUpdateFollowUp, UpdateFollowUp>();
-builder.Services.AddScoped<IDeleteFollowUp, DeleteFollowUp>();
 
 
 //User:
