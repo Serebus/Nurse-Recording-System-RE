@@ -15,7 +15,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.AuthenticationServices
     {
         private readonly Mock<IConfiguration> _mockConfig;
         private readonly Mock<IUserRepository> _mockUserRepo;
-        private UserAuthenticationService _service;
+        private UserAuthenticationService _service = null!;
 
         public UserAuthenticationServiceTest()
         {
@@ -142,7 +142,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.AuthenticationServices
             var response = new LoginResponseDTO { UserName = "nonexistent" };
 
             _mockUserRepo.Setup(IUserRepository => IUserRepository.GetUserByUsernameAsync("nonexistent"))
-                .ReturnsAsync((UserAuthDTO?)null);
+                .ReturnsAsync((UserAuthDTO)null!);
 
             _service = new UserAuthenticationService(_mockConfig.Object, _mockUserRepo.Object);
 

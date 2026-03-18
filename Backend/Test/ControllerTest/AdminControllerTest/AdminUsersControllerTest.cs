@@ -54,10 +54,10 @@ namespace NurseRecordingSystem.Test.ControllerTest.AdminControllerTest
         {
             // Arrange
             var userId = 123;
-            string deletedBy = null;
+            string? deletedBy = null;
 
             // Act
-            var result = await _controller.SoftDeleteUser(userId, deletedBy) as BadRequestObjectResult;
+            var result = await _controller.SoftDeleteUser(userId, deletedBy!) as BadRequestObjectResult;
 
             // Assert
             Assert.NotNull(result);

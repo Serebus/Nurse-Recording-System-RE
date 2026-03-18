@@ -59,6 +59,7 @@ namespace NurseRecordingSystem.Test.ControllerTest
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResult = result as BadRequestObjectResult;
+            Assert.NotNull(badRequestResult);
             Assert.Equal(400, badRequestResult.StatusCode);
         }
 
@@ -82,6 +83,7 @@ namespace NurseRecordingSystem.Test.ControllerTest
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResult = result as BadRequestObjectResult;
+            Assert.NotNull(badRequestResult);
             Assert.Equal(400, badRequestResult.StatusCode);
         }
 

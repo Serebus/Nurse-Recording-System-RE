@@ -112,7 +112,7 @@ namespace NurseRecordingSystem.Test.ControllerTest.NurseControllersTest
             // No user set, so User?.Identity?.Name is null
             _controller.ControllerContext = new ControllerContext
             {
-                HttpContext = new DefaultHttpContext { User = null }
+                HttpContext = new DefaultHttpContext { User = null! }
             };
 
             _mockUpdateService.Setup(service => service.UpdateAsync(id, request, updatedBy)).ReturnsAsync(true);

@@ -16,7 +16,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.AuthenticationServices
         {
             // Arrange
             var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-            var inMemorySettings = new Dictionary<string, string> { ["ConnectionStrings:DefaultConnection"] = "Server=localhost;Database=TestDB;Trusted_Connection=True;" };
+            var inMemorySettings = new Dictionary<string, string?> { ["ConnectionStrings:DefaultConnection"] = "Server=localhost;Database=TestDB;Trusted_Connection=True;" };
             var config = new ConfigurationBuilder().AddInMemoryCollection(inMemorySettings).Build();
 
             // Act

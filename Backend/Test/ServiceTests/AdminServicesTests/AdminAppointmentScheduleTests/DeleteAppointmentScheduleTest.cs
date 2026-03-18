@@ -14,10 +14,10 @@ namespace NurseRecordingSystem.Test.ServiceTests.AdminServicesTests.AdminAppoint
         public void Constructor_NullDbExecutor_ThrowsArgumentNullException()
         {
             // Arrange
-            IDbExecutor dbExecutor = null;
+            IDbExecutor? dbExecutor = null;
 
             // Act & Assert
-            var exception = Assert.Throws<ArgumentNullException>(() => new DeleteAppointmentSchedule(dbExecutor));
+            var exception = Assert.Throws<ArgumentNullException>(() => new DeleteAppointmentSchedule(dbExecutor!));
             Assert.Contains("dbExecutor", exception.Message);
         }
 
@@ -27,10 +27,10 @@ namespace NurseRecordingSystem.Test.ServiceTests.AdminServicesTests.AdminAppoint
             // Arrange
             var mockDbExecutor = new Mock<IDbExecutor>();
             var service = new DeleteAppointmentSchedule(mockDbExecutor.Object);
-            DeleteAppointmentScheduleRequestDTO request = null;
+            DeleteAppointmentScheduleRequestDTO? request = null;
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => service.DeleteAppointmentAsync(1, request));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => service.DeleteAppointmentAsync(1, request!));
         }
 
         [Fact]

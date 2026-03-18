@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NurseRecordingSystem.Contracts.ControllerContracts;
 using NurseRecordingSystem.Contracts.ServiceContracts.Auth;
@@ -58,49 +58,11 @@ namespace NurseRecordingSystem.Controllers.AuthenticationControllers
                 {
                     // A valid token exists, so refresh it
                     tokenResponse = await _sessionTokenService.RefreshSessionTokenAsync(authResponse.AuthId);
-
-                    #region COOKIE LOGIC
-
-                    // 1. Convert the token's byte[] to a URL-safe string
-                    var tokenString = Convert.ToBase64String(tokenResponse.Token);
-
-                    // 2. Define the cookie options for security
-                    var cookieOptions = new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.None,
-                        Expires = tokenResponse.ExpiresOn
-                    };
-
-                    // 3. Add the cookie to the HTTP response
-                    Response.Cookies.Append("SessionToken", tokenString, cookieOptions);
-
-                    #endregion
                 }
                 else
                 {
                     // No valid token exists, so create a new one
                     tokenResponse = await _sessionTokenService.CreateSessionAsync(authResponse.AuthId);
-
-                    #region COOKIE LOGIC
-
-                    // 1. Convert the token's byte[] to a URL-safe string
-                    var tokenString = Convert.ToBase64String(tokenResponse.Token);
-
-                    // 2. Define the cookie options for security
-                    var cookieOptions = new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.None,
-                        Expires = tokenResponse.ExpiresOn
-                    };
-
-                    // 3. Add the cookie to the HTTP response
-                    Response.Cookies.Append("SessionToken", tokenString, cookieOptions);
-
-                    #endregion
                 }
 
                 // Step C: Check if token creation/refresh was successful
@@ -110,7 +72,24 @@ namespace NurseRecordingSystem.Controllers.AuthenticationControllers
                     return StatusCode(500, "Login successful but failed to create or refresh a session token.");
                 }
 
-                
+                #region COOKIE LOGIC
+
+                // 1. Convert the token's byte[] to a URL-safe string
+                var tokenString = Convert.ToBase64String(tokenResponse.Token);
+
+                // 2. Define the cookie options for security
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = tokenResponse.ExpiresOn
+                };
+
+                // 3. Add the cookie to the HTTP response
+                Response.Cookies.Append("SessionToken", tokenString, cookieOptions);
+
+                #endregion
 
                 // Step D: Return the single, successful response
                 return Ok(new

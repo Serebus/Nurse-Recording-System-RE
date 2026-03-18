@@ -50,10 +50,10 @@ namespace NurseRecordingSystem.Test.ServiceTests.AdminServicesTests.AdminUsersTe
                 .Build();
             var service = new DeleteUser(config);
             int userId = 1;
-            string deletedBy = null;
+            string? deletedBy = null;
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => service.SoftDeleteUserAsync(userId, deletedBy));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => service.SoftDeleteUserAsync(userId, deletedBy!));
         }
     }
 }

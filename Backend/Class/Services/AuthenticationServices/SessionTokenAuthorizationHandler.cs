@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Data.SqlClient; // Use this (or System.Data.SqlClient)
 using System.Data;
 
@@ -53,7 +53,7 @@ namespace NurseRecordingSystem.Authorization
             }
 
             // Step 3: Call the Stored Procedure
-            string userRole = null;
+            string? userRole = null;
             await using (var connection = new SqlConnection(_connectionString))
             {
                 try

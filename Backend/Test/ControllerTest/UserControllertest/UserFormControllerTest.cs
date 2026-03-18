@@ -164,11 +164,11 @@ namespace NurseRecordingSystemTest.ControllerTest
         public async Task UpdateUserForm_NullRequest_ReturnsBadRequest()
         {
             // Arrange
-            UpdateUserFormRequestDTO request = null;
+            UpdateUserFormRequestDTO? request = null;
             var updatedBy = "Nurse1";
 
             // Act
-            var result = await _userFormController.UpdateUserForm(request, updatedBy) as BadRequestObjectResult;
+            var result = await _userFormController.UpdateUserForm(request!, updatedBy) as BadRequestObjectResult;
 
             // Assert
             Assert.NotNull(result);
@@ -305,10 +305,10 @@ namespace NurseRecordingSystemTest.ControllerTest
         {
             // Arrange
             int formId = 1;
-            string deletedBy = null; // or "Unknown"
+            string? deletedBy = null; // or "Unknown"
 
             // Act
-            var result = await _userFormController.DeleteUserForm(formId, deletedBy) as UnauthorizedObjectResult;
+            var result = await _userFormController.DeleteUserForm(formId, deletedBy!) as UnauthorizedObjectResult;
 
             // Assert
             Assert.NotNull(result);

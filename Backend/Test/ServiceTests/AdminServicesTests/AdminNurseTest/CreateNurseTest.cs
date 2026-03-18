@@ -15,10 +15,10 @@ namespace NurseRecordingSystem.Test.ServiceTests.AdminServicesTests.AdminNurseTe
         public void Constructor_ConfigurationNull_ThrowsInvalidOperationException()
         {
             // Arrange
-            IConfiguration config = null;
+            IConfiguration? config = null;
 
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => new CreateNurse(config));
+            var exception = Assert.Throws<InvalidOperationException>(() => new CreateNurse(config!));
             Assert.Contains("Connection string 'DefaultConnection' not found.", exception.Message);
         }
 
@@ -43,10 +43,10 @@ namespace NurseRecordingSystem.Test.ServiceTests.AdminServicesTests.AdminNurseTe
                 .AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:DefaultConnection"] = "fakeConnection" })
                 .Build();
             var service = new CreateNurse(config);
-            CreateNurseRequestDTO request = null;
+            CreateNurseRequestDTO? request = null;
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => service.CreateNurseAsync(request));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => service.CreateNurseAsync(request!));
         }
 
         [Fact]

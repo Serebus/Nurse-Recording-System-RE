@@ -48,10 +48,10 @@ namespace NurseRecordingSystem.Test.ServiceTests.UserServicesTests.UserFormsTest
                 .Build();
             var service = new DeleteUserForm(config);
             int formId = 1;
-            string deletedBy = null;
+            string? deletedBy = null;
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => service.DeleteUserFormAsync(formId, deletedBy));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => service.DeleteUserFormAsync(formId, deletedBy!));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Dapper;
+﻿﻿using Dapper;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices;
 using NurseRecordingSystem.DTO.NurseServiceDTOs.NurseAppointmentScheduleDTOs;
 using System.Data;
@@ -7,7 +7,7 @@ namespace NurseRecordingSystem.Class.Services.AdminServices.AdminAppointmentSche
 {
     public interface IDbExecutor
     {
-        Task<int> ExecuteAsync(string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null);
+        Task<int> ExecuteAsync(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null);
     }
 
     public class DapperDbExecutor : IDbExecutor
@@ -19,7 +19,7 @@ namespace NurseRecordingSystem.Class.Services.AdminServices.AdminAppointmentSche
             _dbConnection = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));
         }
 
-        public Task<int> ExecuteAsync(string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        public Task<int> ExecuteAsync(string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
             return _dbConnection.ExecuteAsync(sql, param, transaction, commandTimeout, commandType);
         }

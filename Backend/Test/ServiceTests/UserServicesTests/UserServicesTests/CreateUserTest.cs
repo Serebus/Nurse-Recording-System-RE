@@ -62,6 +62,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.UserServicesTests
             var createUser = new CreateUser(_mockConfiguration.Object);
 
             Assert.True(true); 
+            await Task.CompletedTask;
         }
 
         [Fact]
@@ -72,7 +73,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.UserServicesTests
             var userRequest = new CreateUserRequestDTO();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => createUser.CreateUserAuthenticateAsync(null, userRequest));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => createUser.CreateUserAuthenticateAsync(null!, userRequest));
         }
 
         [Fact]
@@ -85,6 +86,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.UserServicesTests
             var createUser = new CreateUser(_mockConfiguration.Object);
 
             Assert.True(true); // Placeholder
+            await Task.CompletedTask;
         }
 
         [Fact]
@@ -99,6 +101,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.UserServicesTests
             // Act & Assert
 
             Assert.True(true); // Placeholder
+            await Task.CompletedTask;
         }
 
         [Fact]
@@ -113,6 +116,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.UserServicesTests
             // Act & Assert
 
             Assert.True(true); // Placeholder
+            await Task.CompletedTask;
         }
 
 
@@ -135,6 +139,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.UserServicesTests
             // Act & Assert
 
             Assert.True(true); // Placeholder
+            await Task.CompletedTask;
         }
 
         [Fact]
@@ -147,6 +152,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.UserServicesTests
 
             // Act & Assert
             Assert.True(true); // Placeholder
+            await Task.CompletedTask;
         }
     }
 }

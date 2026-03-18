@@ -55,6 +55,7 @@ namespace NurseRecordingSystem.Test.ControllerTest.NurseControllersTest
             // Assert
             Assert.NotNull(result);
             Assert.Equal(201, result.StatusCode);
+            Assert.NotNull(result.Value);
             Assert.Equal(newId, ((dynamic)result.Value).MedicineId);
         }
 

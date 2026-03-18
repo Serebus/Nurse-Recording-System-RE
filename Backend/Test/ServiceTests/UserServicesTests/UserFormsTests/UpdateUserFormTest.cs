@@ -30,11 +30,11 @@ namespace NurseRecordingSystem.Test.ServiceTests.UserServicesTests.UserFormsTest
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
             var service = new UpdateUserForm(config);
-            UpdateUserFormRequestDTO request = null;
+            UpdateUserFormRequestDTO? request = null;
             string updater = "TestUser";
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => service.UpdateUserFormAsync(request, updater));
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => service.UpdateUserFormAsync(request!, updater));
             Assert.Equal("userFormRequest", exception.ParamName);
         }
 

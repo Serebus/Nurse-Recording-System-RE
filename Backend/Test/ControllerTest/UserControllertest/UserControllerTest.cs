@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NurseRecordingSystem.Contracts.ServiceContracts.IUserServices.Users;
 using NurseRecordingSystem.Controllers.UserControllers;
@@ -52,7 +52,7 @@ namespace NurseRecordingSystemTest.ControllerTest
             Assert.Equal(200, result.StatusCode);
 
 
-            dynamic resultValue = result.Value;
+            dynamic? resultValue = result.Value;
             Assert.NotNull(resultValue);
             Assert.Equal(expectedAuthId, resultValue.AuthId); 
             Assert.Equal("Authentication created successfully.", resultValue.Message);

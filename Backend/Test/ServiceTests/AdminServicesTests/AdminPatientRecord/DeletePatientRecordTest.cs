@@ -13,10 +13,10 @@ namespace NurseRecordingSystem.Test.ServiceTests.AdminServicesTests.AdminPatient
         public void Constructor_ConfigurationNull_ThrowsInvalidOperationException()
         {
             // Arrange
-            IConfiguration config = null;
+            IConfiguration? config = null;
 
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => new DeletePatientRecord(config));
+            var exception = Assert.Throws<InvalidOperationException>(() => new DeletePatientRecord(config!));
             Assert.Contains("Configuration cannot be null.", exception.Message);
         }
 

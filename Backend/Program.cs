@@ -175,8 +175,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCors(MyAllowSpecificOrigins);
-app.UseStaticFiles();
 app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
@@ -184,5 +184,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Redirect root to Swagger UI
+app.MapGet("/", context => {
+    context.Response.Redirect("/swagger");
+    return Task.CompletedTask;
+});
 
 app.Run();

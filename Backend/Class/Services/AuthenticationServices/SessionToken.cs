@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
 using NurseRecordingSystem.Contracts.ServiceContracts.Auth;
 using NurseRecordingSystem.DTO.AuthServiceDTOs;
@@ -157,7 +157,7 @@ namespace NurseRecordingSystem.Class.Services.Authentication
                     var result = await cmd.ExecuteScalarAsync();
 
                     // 3. Cast and return the result
-                    return (bool)result;
+                    return result != null && result != DBNull.Value && (bool)result;
                 }
                 catch (SqlException ex)
                 {
