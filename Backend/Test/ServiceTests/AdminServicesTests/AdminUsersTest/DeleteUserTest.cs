@@ -1,7 +1,7 @@
 
 using Microsoft.Extensions.Configuration;
-using Xunit;
 using NurseRecordingSystem.Class.Services.UserServices.Users;
+using Xunit;
 
 namespace NurseRecordingSystem.Test.ServiceTests.AdminServicesTests.AdminUsersTest
 {
@@ -21,21 +21,16 @@ namespace NurseRecordingSystem.Test.ServiceTests.AdminServicesTests.AdminUsersTe
         }
 
         [Fact]
-        public async Task SoftDeleteUserAsync_InvalidConnection_ThrowsException()
+        public async Task SoftDeleteUserAsync_ConnectionFactoryThrows_ThrowsInvalidOperationException()
         {
             // Arrange
-            var inMemorySettings = new Dictionary<string, string?> {
-                {"ConnectionStrings:DefaultConnection", "Server=(localdb)//MSSQLLocalDB;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=1;"}
-            };
-            var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(inMemorySettings)
-                .Build();
-            var service = new DeleteUser(config);
+            var service = new DeleteUser(() => throw new InvalidOperationException("Simulated connection failure"));
             int userId = 1;
             string deletedBy = "Admin1";
 
             // Act & Assert
-            await Assert.ThrowsAsync<Exception>(() => service.SoftDeleteUserAsync(userId, deletedBy));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => service.SoftDeleteUserAsync(userId, deletedBy));
+            Assert.Contains("Simulated connection failure", exception.Message);
         }
 
         [Fact]
@@ -43,7 +38,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.AdminServicesTests.AdminUsersTe
         {
             // Arrange
             var inMemorySettings = new Dictionary<string, string?> {
-                {"ConnectionStrings:DefaultConnection", "Server=(localdb)//MSSQLLocalDB;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=1;"}
+                {"ConnectionStrings:DefaultConnection", "Server=0.0.0.0;Database=Dummy;Connection Timeout=1;ConnectRetryCount=0;"}
             };
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)

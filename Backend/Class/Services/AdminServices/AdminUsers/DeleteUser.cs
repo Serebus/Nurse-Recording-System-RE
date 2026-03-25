@@ -5,12 +5,20 @@ namespace NurseRecordingSystem.Class.Services.UserServices.Users
 {
     public class DeleteUser : IDeleteUser
     {
-        private readonly string? _connectionString;
+        private readonly string _connectionString;
+        private readonly Func<SqlConnection> _connectionFactory;
 
         public DeleteUser(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            _connectionFactory = () => new SqlConnection(_connectionString);
+        }
+
+        internal DeleteUser(Func<SqlConnection> connectionFactory)
+        {
+            _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _connectionString = string.Empty;
         }
 
         // Handles the business logic of deleting user (soft) based on the userId
@@ -23,7 +31,7 @@ namespace NurseRecordingSystem.Class.Services.UserServices.Users
 
             // The stored procedure to call
             const string storedProc = "dbo.asp_DeleteUser";
-            await using (var connection = new SqlConnection(_connectionString))
+            await using (var connection = _connectionFactory())
             await using (var cmd = new SqlCommand(storedProc, connection))
             {
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;

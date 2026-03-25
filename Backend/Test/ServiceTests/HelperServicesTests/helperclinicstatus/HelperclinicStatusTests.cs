@@ -24,7 +24,7 @@ namespace NurseRecordingSystem.Test.ServiceTests.HelperServicesTests.helperclini
         {
             // Arrange
             var inMemorySettings = new Dictionary<string, string?> {
-                {"ConnectionStrings:DefaultConnection", "Server=(localdb)//MSSQLLocalDB;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=1;"}
+                {"ConnectionStrings:DefaultConnection", "Server=DESKTOP-UM7KJD2\\SQLEXPRESS;Database=NurseRecordingSystem;Trusted_Connection=True;TrustServerCertificate=True;"}
             };
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
