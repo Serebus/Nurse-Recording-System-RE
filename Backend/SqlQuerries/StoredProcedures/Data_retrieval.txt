@@ -1,0 +1,60 @@
+-- ==========================================
+-- 4. Stored Procedures (Data Retrieval)
+-- ==========================================
+
+CREATE OR ALTER PROCEDURE dbo.hsp_ViewUserForm
+    @formId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (SELECT 1 FROM [PatientForm] WHERE FormId = @formId AND IsActive = 1)
+    BEGIN
+        -- Error matched by C# exception handling checking error code 50001
+        THROW 50001, 'Patient form not found or is archived.', 1;
+    END
+
+    SELECT 
+        FormId AS formId,
+        IssueType AS issueType,
+        IssueDescryption AS issueDescryption, 
+        Status AS status,
+        UserId AS userId,
+        PatientName AS patientName,
+        CreatedOn AS createdOn,
+        CreatedBy AS createdBy,
+        UpdatedOn AS updatedOn,
+        UpdatedBy AS updatedBy,
+        IsActive AS isActive
+    FROM [PatientForm]
+    WHERE FormId = @formId AND IsActive = 1;
+END;
+GO
+
+
+CREATE OR ALTER PROCEDURE dbo.nsp_ViewAllUsers
+    @IsActive BIT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        u.UserId AS userId,
+        a.UserName AS userName,
+        a.Email AS email,
+        u.Role AS role,
+        u.FirstName AS firstName,
+        u.MiddleName AS middleName,
+        u.LastName AS lastName,
+        u.ContactNumber AS contactNumber,
+        u.Address AS address,
+        u.IsActive AS isActive,
+        u.CreatedOn AS createdOn,
+        u.CreatedBy AS createdBy,
+        u.UpdatedOn AS updatedOn,
+        u.UpdatedBy AS updatedBy
+    FROM [Users] u
+    INNER JOIN [Auth] a ON u.AuthId = a.AuthId
+    WHERE (@IsActive IS NULL OR u.IsActive = @IsActive);
+END;
+GO

@@ -1,0 +1,150 @@
+-- ==========================================
+-- 3. Stored Procedures (Authentication & Session)
+-- ==========================================
+
+CREATE OR ALTER PROCEDURE dbo.usp_CreateUserAndAuth
+    @userName NVARCHAR(100),
+    @passwordHash VARBINARY(MAX),
+    @passwordSalt VARBINARY(MAX),
+    @email NVARCHAR(255),
+    @createdBy NVARCHAR(100),
+    @updatedOn DATETIME,
+    @updatedBy NVARCHAR(100),
+    @isActive BIT,
+    @firstName NVARCHAR(100),
+    @middleName NVARCHAR(100),
+    @lastName NVARCHAR(100),
+    @contactNumber NVARCHAR(20),
+    @address NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Check for email existence (matching C# exception handling)
+    IF EXISTS (SELECT 1 FROM [Auth] WHERE Email = @email)
+    BEGIN
+        THROW 50002, 'Email already existing', 1;
+    END
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        DECLARE @NewAuthId INT;
+
+        INSERT INTO [Auth] (UserName, PasswordHash, PasswordSalt, Email, CreatedBy, UpdatedOn, UpdatedBy, IsActive)
+        VALUES (@userName, @passwordHash, @passwordSalt, @email, @createdBy, @updatedOn, @updatedBy, @isActive);
+
+        SET @NewAuthId = SCOPE_IDENTITY();
+
+        INSERT INTO [Users] (AuthId, FirstName, MiddleName, LastName, ContactNumber, Address, Role, CreatedBy, UpdatedOn, UpdatedBy, IsActive)
+        VALUES (@NewAuthId, @firstName, @middleName, @lastName, @contactNumber, @address, 'User', @createdBy, @updatedOn, @updatedBy, @isActive);
+        
+        COMMIT TRANSACTION;
+        
+        -- Return new AuthId to execute via ExecuteScalarAsync
+        SELECT @NewAuthId;
+        
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END;
+GO
+
+
+CREATE OR ALTER PROCEDURE dbo.usp_CreateSessionToken
+    @authId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Deactivate any previously active tokens for this user
+    UPDATE [SessionToken] SET IsActive = 0 WHERE AuthId = @authId AND IsActive = 1;
+
+    DECLARE @NewToken VARBINARY(64) = CRYPT_GEN_RANDOM(64);
+    DECLARE @ExpiresOn DATETIME = DATEADD(HOUR, 2, GETUTCDATE()); -- 2 Hours Expiration
+
+    INSERT INTO [SessionToken] (Token, AuthId, ExpiresOn, IsActive)
+    VALUES (@NewToken, @authId, @ExpiresOn, 1);
+
+    SELECT 
+        TokenId AS tokenId, 
+        Token AS token, 
+        AuthId AS authId, 
+        ExpiresOn AS expiresOn, 
+        CAST(IsActive AS INT) AS isActive -- C# maps this to int
+    FROM [SessionToken] 
+    WHERE TokenId = SCOPE_IDENTITY();
+END;
+GO
+
+
+CREATE OR ALTER PROCEDURE dbo.usp_UpdateSessionToken
+    @authId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @NewToken VARBINARY(64) = CRYPT_GEN_RANDOM(64);
+    DECLARE @ExpiresOn DATETIME = DATEADD(HOUR, 2, GETUTCDATE());
+
+    UPDATE [SessionToken]
+    SET Token = @NewToken, ExpiresOn = @ExpiresOn
+    WHERE AuthId = @authId AND IsActive = 1 AND ExpiresOn > GETUTCDATE();
+
+    SELECT 
+        TokenId AS tokenId, 
+        Token AS token, 
+        AuthId AS authId, 
+        ExpiresOn AS expiresOn, 
+        CAST(IsActive AS INT) AS isActive
+    FROM [SessionToken] 
+    WHERE AuthId = @authId AND IsActive = 1 AND Token = @NewToken;
+END;
+GO
+
+
+CREATE OR ALTER PROCEDURE dbo.usp_EndSessionToken
+    @Token VARBINARY(64)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE [SessionToken]
+    SET IsActive = 0
+    WHERE Token = @Token AND IsActive = 1;
+END;
+GO
+
+
+CREATE OR ALTER PROCEDURE dbo.usp_ValidateSessionToken
+    @authId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @IsValid BIT = 0;
+    
+    IF EXISTS (SELECT 1 FROM [SessionToken] WHERE AuthId = @authId AND IsActive = 1 AND ExpiresOn > GETUTCDATE())
+    BEGIN
+        SET @IsValid = 1;
+    END
+
+    SELECT @IsValid;
+END;
+GO
+
+
+CREATE OR ALTER PROCEDURE sp_ValidateSessionTokenAndGetRole
+    @Token VARBINARY(64)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT u.Role
+    FROM [SessionToken] st
+    INNER JOIN [Auth] a ON st.AuthId = a.AuthId
+    INNER JOIN [Users] u ON a.AuthId = u.AuthId
+    WHERE st.Token = @Token AND st.IsActive = 1 AND st.ExpiresOn > GETUTCDATE();
+END;
+GO
