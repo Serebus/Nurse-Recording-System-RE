@@ -23,9 +23,11 @@ BEGIN
     -- Check for email existence (matching C# exception handling)
     IF EXISTS (SELECT 1 FROM [Auth] WHERE Email = @email)
     BEGIN
-        THROW 50002, 'Email already existing', 1;
+        -- RAISERROR is used for compatibility with SQL Server versions older than 2012.
+        RAISERROR ('Email already existing', 16, 1);
+        RETURN;
     END
-
+ 
     BEGIN TRY
         BEGIN TRANSACTION;
 
@@ -48,7 +50,17 @@ BEGIN
     BEGIN CATCH
         IF @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
-        THROW;
+
+        -- Re-throw the original error for the application to handle
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT 
+            @ErrorMessage = ERROR_MESSAGE(),
+            @ErrorSeverity = ERROR_SEVERITY(),
+            @ErrorState = ERROR_STATE();
+        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
     END CATCH
 END;
 GO
@@ -67,21 +79,81 @@ BEGIN
         a.PasswordHash AS passwordHash,
         a.PasswordSalt AS passwordSalt,
         u.Role AS role,
-        u.UserId AS userId,
+        ISNULL(u.UserId, 0) AS userId,
         u.FirstName AS User_firstName,
         u.MiddleName AS User_middleName,
         u.LastName AS User_lastName,
         u.ContactNumber AS User_contactNumber,
         u.Address AS User_address,
-        CAST(NULL AS INT) AS nurseId,
-        CAST(NULL AS NVARCHAR(100)) AS Nurse_firstName,
-        CAST(NULL AS NVARCHAR(100)) AS Nurse_middleName,
-        CAST(NULL AS NVARCHAR(100)) AS Nurse_lastName,
-        CAST(NULL AS NVARCHAR(20)) AS Nurse_contactNumber
+        CASE WHEN u.Role = 'Nurse' THEN ISNULL(u.UserId, 0) ELSE 0 END AS nurseId,
+        CASE WHEN u.Role = 'Nurse' THEN ISNULL(u.FirstName, '') ELSE '' END AS Nurse_firstName,
+        CASE WHEN u.Role = 'Nurse' THEN ISNULL(u.MiddleName, '') ELSE '' END AS Nurse_middleName,
+        CASE WHEN u.Role = 'Nurse' THEN ISNULL(u.LastName, '') ELSE '' END AS Nurse_lastName,
+        CASE WHEN u.Role = 'Nurse' THEN ISNULL(u.ContactNumber, '') ELSE '' END AS Nurse_contactNumber
     FROM [Auth] a
     LEFT JOIN [Users] u ON a.AuthId = u.AuthId
     WHERE a.Email = @email
       AND a.IsActive = 1;
+END;
+GO
+
+
+CREATE OR ALTER PROCEDURE dbo.asp_CreateNurse
+    @userName NVARCHAR(100),
+    @passwordHash VARBINARY(MAX),
+    @passwordSalt VARBINARY(MAX),
+    @email NVARCHAR(255),
+    @createdBy NVARCHAR(100),
+    @updatedOn DATETIME,
+    @updatedBy NVARCHAR(100),
+    @isActive BIT,
+    @firstName NVARCHAR(100),
+    @middleName NVARCHAR(100),
+    @lastName NVARCHAR(100),
+    @contactNumber NVARCHAR(20)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (SELECT 1 FROM [Auth] WHERE Email = @email)
+    BEGIN
+        -- RAISERROR is used for compatibility with SQL Server versions older than 2012.
+        RAISERROR ('Email already existing', 16, 1);
+        RETURN;
+    END
+ 
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        DECLARE @NewAuthId INT;
+
+        INSERT INTO [Auth] (UserName, PasswordHash, PasswordSalt, Email, CreatedBy, UpdatedOn, UpdatedBy, IsActive)
+        VALUES (@userName, @passwordHash, @passwordSalt, @email, @createdBy, @updatedOn, @updatedBy, @isActive);
+
+        SET @NewAuthId = SCOPE_IDENTITY();
+
+        INSERT INTO [Users] (AuthId, FirstName, MiddleName, LastName, ContactNumber, Address, Role, CreatedBy, UpdatedOn, UpdatedBy, IsActive)
+        VALUES (@NewAuthId, @firstName, @middleName, @lastName, @contactNumber, NULL, 'Nurse', @createdBy, @updatedOn, @updatedBy, @isActive);
+
+        COMMIT TRANSACTION;
+
+        SELECT @NewAuthId;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        -- Re-throw the original error for the application to handle
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT 
+            @ErrorMessage = ERROR_MESSAGE(),
+            @ErrorSeverity = ERROR_SEVERITY(),
+            @ErrorState = ERROR_STATE();
+        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+    END CATCH
 END;
 GO
 

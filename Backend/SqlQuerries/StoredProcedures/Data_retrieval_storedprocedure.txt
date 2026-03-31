@@ -8,11 +8,11 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF NOT EXISTS (SELECT 1 FROM [PatientForm] WHERE FormId = @formId AND IsActive = 1)
-    BEGIN
-        -- Error matched by C# exception handling checking error code 50001
-        THROW 50001, 'Patient form not found or is archived.', 1;
-    END
+IF NOT EXISTS (SELECT 1 FROM [PatientForm] WHERE FormId = @formId AND IsActive = 1)
+BEGIN
+    -- Add semicolon before THROW
+    ;THROW 50001, 'Patient form not found or is archived.', 1;
+END
 
     SELECT 
         FormId AS formId,
