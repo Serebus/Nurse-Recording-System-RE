@@ -54,6 +54,38 @@ END;
 GO
 
 
+CREATE OR ALTER PROCEDURE dbo.usp_LoginUserAuth
+    @email NVARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        a.AuthId AS authId,
+        a.UserName AS userName,
+        a.Email AS email,
+        a.PasswordHash AS passwordHash,
+        a.PasswordSalt AS passwordSalt,
+        u.Role AS role,
+        u.UserId AS userId,
+        u.FirstName AS User_firstName,
+        u.MiddleName AS User_middleName,
+        u.LastName AS User_lastName,
+        u.ContactNumber AS User_contactNumber,
+        u.Address AS User_address,
+        CAST(NULL AS INT) AS nurseId,
+        CAST(NULL AS NVARCHAR(100)) AS Nurse_firstName,
+        CAST(NULL AS NVARCHAR(100)) AS Nurse_middleName,
+        CAST(NULL AS NVARCHAR(100)) AS Nurse_lastName,
+        CAST(NULL AS NVARCHAR(20)) AS Nurse_contactNumber
+    FROM [Auth] a
+    LEFT JOIN [Users] u ON a.AuthId = u.AuthId
+    WHERE a.Email = @email
+      AND a.IsActive = 1;
+END;
+GO
+
+
 CREATE OR ALTER PROCEDURE dbo.usp_CreateSessionToken
     @authId INT
 AS
