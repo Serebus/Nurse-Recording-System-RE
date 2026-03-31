@@ -1,4 +1,5 @@
 using Microsoft.Data.SqlClient;
+using Dapper;
 using NurseRecordingSystem.Class.Services.HelperServices.HelperAuthentication;
 using NurseRecordingSystem.Contracts.RepositoryContracts.User;
 using NurseRecordingSystem.Contracts.ServiceContracts.Auth;
@@ -31,71 +32,59 @@ namespace NurseRecordingSystem.Class.Services.Authentication
                 throw new ArgumentNullException(nameof(request), "LoginRequest cannot be Null");
             }
 
-            using (var connection = new SqlConnection(_connectionString))
-            using (var cmdLoginUser = new SqlCommand("dbo.ausp_LoginUserAuth", connection))
+            await using var connection = new SqlConnection(_connectionString);
+            try
             {
-                cmdLoginUser.CommandType = System.Data.CommandType.StoredProcedure;
-                cmdLoginUser.Parameters.AddWithValue("@email", request.Email);
+                // Dapper Row maps fields dynamically
+                var userRow = await connection.QueryFirstOrDefaultAsync(
+                    "dbo.ausp_LoginUserAuth",
+                    new { email = request.Email },
+                    commandType: System.Data.CommandType.StoredProcedure
+                );
 
-                try
+                if (userRow != null && PasswordHelper.VerifyPasswordHash(request.Password, (byte[])userRow.passwordHash, (byte[])userRow.passwordSalt))
                 {
-                    await connection.OpenAsync();
-                    using (var reader = await cmdLoginUser.ExecuteReaderAsync()) // Use ExecuteReaderAsync
+                    string userRole = userRow.role.ToString();
+                    var response = new LoginResponseDTO
                     {
-                        if (await reader.ReadAsync()) // Use ReadAsync
+                        AuthId = (int)userRow.authId,
+                        UserName = userRow.userName.ToString(),
+                        Email = userRow.email.ToString(),
+                        Role = userRole,
+                        IsAuthenticated = true
+                    };
+
+                    if (userRole == "User")
+                    {
+                        response.UserDetails = new UserDetailsDTO
                         {
-                            // First, verify the password
-                            if (PasswordHelper.VerifyPasswordHash(request.Password,
-                                (byte[])reader["passwordHash"], (byte[])reader["passwordSalt"]))
-                            {
-                                string userRole = reader["role"].ToString()!;
-
-                                // Create the base response
-                                var response = new LoginResponseDTO
-                                {
-                                    AuthId = (int)reader["authId"],
-                                    UserName = reader["userName"].ToString()!,
-                                    Email = reader["email"].ToString()!,
-                                    Role = userRole,
-                                    IsAuthenticated = true
-                                };
-
-                                if (userRole == "User")
-                                {
-                                    response.UserDetails = new UserDetailsDTO
-                                    {
-                                        UserId = (int)reader["userId"],
-                                        FirstName = reader["User_firstName"].ToString()!,
-                                        // Check for DBNull before reading nullable fields
-                                        MiddleName = reader["User_middleName"] == DBNull.Value ? null : reader["User_middleName"].ToString(),
-                                        LastName = reader["User_lastName"].ToString()!,
-                                        ContactNumber = reader["User_contactNumber"].ToString()!,
-                                        Address = reader["User_address"] == DBNull.Value ? null : reader["User_address"].ToString()
-                                    };
-                                }
-                                else if (userRole == "Nurse")
-                                {
-                                    response.NurseDetails = new NurseDetailsDTO
-                                    {
-                                        NurseId = (int)reader["nurseId"],
-                                        FirstName = reader["Nurse_firstName"].ToString()!,
-                                        MiddleName = reader["Nurse_middleName"] == DBNull.Value ? null : reader["Nurse_middleName"].ToString(),
-                                        LastName = reader["Nurse_lastName"].ToString()!,
-                                        ContactNumber = reader["Nurse_contactNumber"] == DBNull.Value ? null : reader["Nurse_contactNumber"].ToString()
-                                    };
-                                }
-
-                                return response;
-                            }
-                        }
+                            UserId = (int)userRow.userId,
+                            FirstName = userRow.User_firstName.ToString(),
+                            MiddleName = userRow.User_middleName?.ToString(),
+                            LastName = userRow.User_lastName.ToString(),
+                            ContactNumber = userRow.User_contactNumber.ToString(),
+                            Address = userRow.User_address?.ToString()
+                        };
                     }
-                }
-                catch (SqlException ex)
-                {
-                    throw new Exception("Database ERROR occurred during login", ex);
-                }
+                    else if (userRole == "Nurse")
+                    {
+                        response.NurseDetails = new NurseDetailsDTO
+                        {
+                            NurseId = (int)userRow.nurseId,
+                            FirstName = userRow.Nurse_firstName.ToString(),
+                            MiddleName = userRow.Nurse_middleName?.ToString(),
+                            LastName = userRow.Nurse_lastName.ToString(),
+                            ContactNumber = userRow.Nurse_contactNumber?.ToString()
+                        };
+                    }
 
-                return null; // Invalid credentials (password wrong or user not found)
+                    return response;
+                }
+                return null;
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database ERROR occurred during login", ex);
             }
         }
         #endregion
