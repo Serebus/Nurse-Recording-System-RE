@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+﻿﻿using Microsoft.Data.SqlClient;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INurseUsers;
 using NurseRecordingSystem.Model.DTO.UserServiceDTOs.UsersDTOs; // Assuming ViewUserDTO
 
@@ -59,8 +59,8 @@ namespace NurseRecordingSystem.Class.Services.UserServices.Users
                                 IsActive = reader.GetBoolean(reader.GetOrdinal("isActive")),
                                 CreatedOn = reader.GetDateTime(reader.GetOrdinal("createdOn")),
                                 CreatedBy = reader.GetString(reader.GetOrdinal("createdBy")),
-                                UpdatedOn = reader.GetDateTime(reader.GetOrdinal("updatedOn")),
-                                UpdatedBy = reader.GetString(reader.GetOrdinal("updatedBy")),
+                                UpdatedOn = reader.IsDBNull(reader.GetOrdinal("updatedOn")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("updatedOn")),
+                                UpdatedBy = reader.IsDBNull(reader.GetOrdinal("updatedBy")) ? null : reader.GetString(reader.GetOrdinal("updatedBy")),
                             });
                         }
                     }

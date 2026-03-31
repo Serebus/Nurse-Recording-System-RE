@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+﻿﻿using Microsoft.Data.SqlClient;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INursePatientRecords;
 using NurseRecordingSystem.DTO.NurseServiceDTOs.NursePatientRecordDTOs;
 
@@ -10,12 +10,13 @@ namespace NurseRecordingSystem.Class.Services.NurseServices.PatientRecords
 
         public ViewPatientRecordList(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
         public async Task<List<PatientRecordListItemDTO>> GetPatientRecordListAsync(int? nurseId = null)
         {
-            var forms = new List<PatientRecordListItemDTO>();
+            var records = new List<PatientRecordListItemDTO>();
             const string storedProc = "dbo.nsp_ViewPatientRecordList";
 
             await using (var connection = new SqlConnection(_connectionString))
@@ -31,17 +32,17 @@ namespace NurseRecordingSystem.Class.Services.NurseServices.PatientRecords
                     {
                         while (await reader.ReadAsync())
                         {
-                            forms.Add(new PatientRecordListItemDTO
+                            records.Add(new PatientRecordListItemDTO
                             {
                                 PatientRecordId = reader.GetInt32(reader.GetOrdinal("patientRecordId")),
-                                NursingDiagnosis = reader.GetString(reader.GetOrdinal("nursingDiagnosis")),
-                                NursingIntervention = reader.GetString(reader.GetOrdinal("nursingIntervention")),
+                                NursingDiagnosis = reader.IsDBNull(reader.GetOrdinal("nursingDiagnosis")) ? null : reader.GetString(reader.GetOrdinal("nursingDiagnosis")),
+                                NursingIntervention = reader.IsDBNull(reader.GetOrdinal("nursingIntervention")) ? null : reader.GetString(reader.GetOrdinal("nursingIntervention")),
                                 CreatedOn = reader.GetDateTime(reader.GetOrdinal("createdOn")),
                                 CreatedBy = reader.GetString(reader.GetOrdinal("createdBy"))
                             });
                         }
                     }
-                    return forms;
+                    return records;
                 }
                 catch (Exception ex)
                 {
