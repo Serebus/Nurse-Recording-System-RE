@@ -50,21 +50,23 @@ export const useAuthStore = defineStore('authStore', () => {
 
   const logout = async () => {
     try {
-    await fetch('https://localhost:7031/api/Auth/logout', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}) 
-    })
-  } catch (error) {
-    console.error('Logout error', error)
-  } finally {
-    // Always clear client state, even if server errors out
-    nurse.value = null
-    localStorage.removeItem('nurse')
-    localStorage.removeItem('nurseId')
-    // Optional: Redirect to login
-  }
+      const response = await fetch('https://localhost:7031/api/Auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        console.error('Server-side logout failed:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Network error during logout:', error);
+    } finally {
+      // Always clear client state, even if server errors out
+      nurse.value = null;
+      localStorage.removeItem('nurse');
+      localStorage.removeItem('nurseId');
+      // Optional: Redirect to login
+    }
   }
 
   return {

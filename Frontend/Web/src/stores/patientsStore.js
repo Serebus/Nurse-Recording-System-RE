@@ -20,8 +20,6 @@ export const usePatientStore = defineStore('patientStore', () => {
     }
   }
 
-  fetchPatients()
-
   const formPatient = ref({
     userId: null,
     userName: '',
@@ -219,6 +217,6 @@ export const usePatientStore = defineStore('patientStore', () => {
     resetForm,
     addPatient,
     editPatient,
+    fetchPatients,
   }
 })
-

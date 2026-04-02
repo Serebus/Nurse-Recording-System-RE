@@ -20,8 +20,6 @@ export const usePatientRecord = defineStore('patientRecord', () => {
     }
   }
 
-  fetchRecords()
-
   // Re-introduced 'recordId' as the human-readable ID
   const recordForm = ref({
     id: null, // Server's auto-increment ID (internal)

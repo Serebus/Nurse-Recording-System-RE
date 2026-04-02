@@ -1,8 +1,9 @@
-﻿﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NurseRecordingSystem.Contracts.ControllerContracts;
 using NurseRecordingSystem.Contracts.ServiceContracts.Auth;
 using NurseRecordingSystem.DTO.AuthServiceDTOs;
+using Microsoft.Extensions.Logging;
 
 namespace NurseRecordingSystem.Controllers.AuthenticationControllers
 {
@@ -12,10 +13,12 @@ namespace NurseRecordingSystem.Controllers.AuthenticationControllers
     {
         private readonly IUserAuthenticationService _userAuthenticationService;
         // 1. Add the Session Token Service
+        private readonly ILogger<AuthController> _logger;
         private readonly ISessionTokenService _sessionTokenService;
 
         // 2. Inject the service in the constructor
         public AuthController(
+            ILogger<AuthController> logger,
             IUserAuthenticationService userAuthenticationService,
             ISessionTokenService sessionTokenService)
         {
@@ -23,6 +26,7 @@ namespace NurseRecordingSystem.Controllers.AuthenticationControllers
                 ?? throw new ArgumentNullException(nameof(userAuthenticationService), "UserAuthentication cannot be null");
 
             // 3. Assign the injected service
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _sessionTokenService = sessionTokenService
                 ?? throw new ArgumentNullException(nameof(sessionTokenService), "SessionTokenService cannot be null");
         }
@@ -116,8 +120,13 @@ namespace NurseRecordingSystem.Controllers.AuthenticationControllers
             try
             {
                 // 1. Retrieve the SessionToken from cookies
+                _logger.LogInformation("Logout request received. Cookie exists: {CookieExists}, Token length: {TokenLength}", 
+                    Request.Cookies.ContainsKey("SessionToken"), 
+                    Request.Cookies["SessionToken"]?.Length ?? 0);
+
                 if (!Request.Cookies.TryGetValue("SessionToken", out string? tokenString) || string.IsNullOrEmpty(tokenString))
                 {
+                    _logger.LogWarning("Logout failed: No valid SessionToken cookie found.");
                     return BadRequest("No session token found in cookies.");
                 }
                 // 2. Convert the token string back to byte[]
@@ -125,15 +134,25 @@ namespace NurseRecordingSystem.Controllers.AuthenticationControllers
                 try
                 {
                     tokenBytes = Convert.FromBase64String(tokenString);
+                    _logger.LogInformation("Token decoded successfully. Token bytes length: {TokenBytesLength}", tokenBytes.Length);
                 }
                 catch (FormatException)
                 {
+                    _logger.LogWarning("Logout failed: Invalid base64 token format. Token string: {TokenString}", tokenString?.Substring(0, Math.Min(20, tokenString.Length)) + "...");
                     return BadRequest("Invalid session token format.");
                 }
                 // 3. Invalidate the session token
+                _logger.LogInformation("Calling EndSessionAsync...");
                 bool logoutSuccess = await _sessionTokenService.EndSessionAsync(tokenBytes);
+                _logger.LogInformation("EndSessionAsync completed: Success={Success}", logoutSuccess);
                 // 4. Remove the cookie from the client
-                Response.Cookies.Delete("SessionToken");
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None
+                };
+                Response.Cookies.Delete("SessionToken", cookieOptions);
                 return Ok("Logout successful.");
             }
             catch (Exception ex)
