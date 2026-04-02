@@ -126,8 +126,8 @@ namespace NurseRecordingSystem.Controllers.AuthenticationControllers
 
                 if (!Request.Cookies.TryGetValue("SessionToken", out string? tokenString) || string.IsNullOrEmpty(tokenString))
                 {
-                    _logger.LogWarning("Logout failed: No valid SessionToken cookie found.");
-                    return BadRequest("No session token found in cookies.");
+                    _logger.LogInformation("Logout: No session token found, user already logged out.");
+                    return Ok("Already logged out.");
                 }
                 // 2. Convert the token string back to byte[]
                 byte[] tokenBytes;
