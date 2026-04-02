@@ -36,18 +36,23 @@ namespace NurseRecordingSystem.Authorization
             // Step 1: Read the token string from the cookie
             if (!httpContext.Request.Cookies.TryGetValue("SessionToken", out var tokenString))
             {
+                System.Diagnostics.Debug.WriteLine("[AuthHandler] No SessionToken cookie found");
                 context.Fail(); // No session token cookie
                 return;
             }
+
+            System.Diagnostics.Debug.WriteLine($"[AuthHandler] SessionToken cookie found, length: {tokenString?.Length ?? 0}");
 
             byte[] tokenBytes;
             try
             {
                 // Step 2: Convert the Base64 string back to bytes
                 tokenBytes = Convert.FromBase64String(tokenString);
+                System.Diagnostics.Debug.WriteLine($"[AuthHandler] Token decoded successfully, bytes length: {tokenBytes.Length}");
             }
             catch
             {
+                System.Diagnostics.Debug.WriteLine("[AuthHandler] Failed to decode Base64 token");
                 context.Fail(); // Invalid token format
                 return;
             }
@@ -92,19 +97,27 @@ namespace NurseRecordingSystem.Authorization
             // Step 4: Validate the role
             if (userRole == null)
             {
+                System.Diagnostics.Debug.WriteLine($"[AuthHandler] SP returned no role for token. Token length: {tokenBytes.Length}");
                 context.Fail(); // SP returned no role (token invalid/expired)
                 return;
             }
+
+            // Trim whitespace in case SP returns role with spaces
+            userRole = userRole.Trim();
+            System.Diagnostics.Debug.WriteLine($"[AuthHandler] User role from SP: '{userRole}'");
+            System.Diagnostics.Debug.WriteLine($"[AuthHandler] Required roles: {string.Join(", ", requirement.AllowedRoles)}");
 
             // Step 5:
             // Check if the role from the SP is in the requirement's list
             if (requirement.AllowedRoles.Contains(userRole))
             {
+                System.Diagnostics.Debug.WriteLine($"[AuthHandler] Authorization succeeded for role: {userRole}");
                 // Success! The user's role is one of the allowed roles.
                 context.Succeed(requirement);
             }
             else
             {
+                System.Diagnostics.Debug.WriteLine($"[AuthHandler] Authorization failed - role '{userRole}' not in allowed list");
                 context.Fail(); // User's role is not in the allowed list
             }
         }
