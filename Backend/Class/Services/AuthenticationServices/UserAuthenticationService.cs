@@ -54,7 +54,7 @@ namespace NurseRecordingSystem.Class.Services.Authentication
                         IsAuthenticated = true
                     };
 
-                    if (userRole == "User")
+                    if (userRole == "User" && userRow.userId != null)
                     {
                         response.UserDetails = new UserDetailsDTO
                         {
@@ -66,7 +66,7 @@ namespace NurseRecordingSystem.Class.Services.Authentication
                             Address = userRow.User_address?.ToString()
                         };
                     }
-                    else if (userRole == "Nurse")
+                    else if (userRole == "Nurse" && userRow.nurseId != null)
                     {
                         response.NurseDetails = new NurseDetailsDTO
                         {
