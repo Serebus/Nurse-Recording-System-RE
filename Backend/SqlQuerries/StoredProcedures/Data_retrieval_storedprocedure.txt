@@ -2,22 +2,27 @@
 -- 4. Stored Procedures (Data Retrieval)
 -- ==========================================
 
-CREATE OR ALTER PROCEDURE dbo.hsp_ViewUserForm
+IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = 'hsp_ViewUserForm')
+    DROP PROCEDURE dbo.hsp_ViewUserForm;
+GO
+
+CREATE PROCEDURE dbo.hsp_ViewUserForm
     @formId INT
 AS
 BEGIN
     SET NOCOUNT ON;
 
-IF NOT EXISTS (SELECT 1 FROM [PatientForm] WHERE FormId = @formId AND IsActive = 1)
-BEGIN
-    -- Add semicolon before THROW
-    ;THROW 50001, 'Patient form not found or is archived.', 1;
-END
+    IF NOT EXISTS (SELECT 1 FROM [PatientForm] WHERE FormId = @formId AND IsActive = 1)
+    BEGIN
+        -- Error matched by C# exception handling checking error code 50001
+        RAISERROR('Patient form not found or is archived.', 16, 1);
+        RETURN;
+    END
 
-    SELECT 
+    SELECT
         FormId AS formId,
         IssueType AS issueType,
-        IssueDescryption AS issueDescryption, 
+        IssueDescryption AS issueDescryption,
         Status AS status,
         UserId AS userId,
         PatientName AS patientName,
@@ -32,13 +37,17 @@ END;
 GO
 
 
-CREATE OR ALTER PROCEDURE dbo.nsp_ViewAllUsers
+IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = 'nsp_ViewAllUsers')
+    DROP PROCEDURE dbo.nsp_ViewAllUsers;
+GO
+
+CREATE PROCEDURE dbo.nsp_ViewAllUsers
     @IsActive BIT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT 
+    SELECT
         u.UserId AS userId,
         a.UserName AS userName,
         a.Email AS email,

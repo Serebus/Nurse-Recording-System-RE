@@ -30,12 +30,12 @@ export const useAuthStore = defineStore('authStore', () => {
 
       const data = await response.json()
 
-      if (data.user && data.user.isAuthenticated) {
+      if (data.User && data.User.isAuthenticated) {
         // We only save the user INFO. The token is now safely hidden in a cookie.
-        nurse.value = data.user
+        nurse.value = data.User
         localStorage.setItem('nurse', JSON.stringify(nurse.value))
-        if (data.user.nurseDetails && data.user.nurseDetails.nurseId) {
-          localStorage.setItem('nurseId', data.user.nurseDetails.nurseId);
+        if (data.User.nurseDetails && data.User.nurseDetails.nurseId) {
+          localStorage.setItem('nurseId', data.User.nurseDetails.nurseId);
         }
         return true
       } else {

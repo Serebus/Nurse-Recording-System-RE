@@ -2,7 +2,11 @@
 -- 3. Stored Procedures (Authentication & Session)
 -- ==========================================
 
-CREATE OR ALTER PROCEDURE dbo.usp_CreateUserAndAuth
+IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = 'usp_CreateUserAndAuth')
+    DROP PROCEDURE dbo.usp_CreateUserAndAuth;
+GO
+
+CREATE PROCEDURE dbo.usp_CreateUserAndAuth
     @userName NVARCHAR(100),
     @passwordHash VARBINARY(MAX),
     @passwordSalt VARBINARY(MAX),
@@ -23,11 +27,10 @@ BEGIN
     -- Check for email existence (matching C# exception handling)
     IF EXISTS (SELECT 1 FROM [Auth] WHERE Email = @email)
     BEGIN
-        -- RAISERROR is used for compatibility with SQL Server versions older than 2012.
-        RAISERROR ('Email already existing', 16, 1);
+        RAISERROR('Email already existing', 16, 1);
         RETURN;
     END
- 
+
     BEGIN TRY
         BEGIN TRANSACTION;
 
@@ -40,33 +43,27 @@ BEGIN
 
         INSERT INTO [Users] (AuthId, FirstName, MiddleName, LastName, ContactNumber, Address, Role, CreatedBy, UpdatedOn, UpdatedBy, IsActive)
         VALUES (@NewAuthId, @firstName, @middleName, @lastName, @contactNumber, @address, 'User', @createdBy, @updatedOn, @updatedBy, @isActive);
-        
+
         COMMIT TRANSACTION;
-        
+
         -- Return new AuthId to execute via ExecuteScalarAsync
         SELECT @NewAuthId;
-        
+
     END TRY
     BEGIN CATCH
         IF @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
-
-        -- Re-throw the original error for the application to handle
-        DECLARE @ErrorMessage NVARCHAR(4000);
-        DECLARE @ErrorSeverity INT;
-        DECLARE @ErrorState INT;
-
-        SELECT 
-            @ErrorMessage = ERROR_MESSAGE(),
-            @ErrorSeverity = ERROR_SEVERITY(),
-            @ErrorState = ERROR_STATE();
-        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+        RAISERROR('Error creating user and auth', 16, 1);
     END CATCH
 END;
 GO
 
 
-CREATE OR ALTER PROCEDURE dbo.usp_LoginUserAuth
+IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = 'usp_LoginUserAuth')
+    DROP PROCEDURE dbo.usp_LoginUserAuth;
+GO
+
+CREATE PROCEDURE dbo.usp_LoginUserAuth
     @email NVARCHAR(255)
 AS
 BEGIN
@@ -79,17 +76,17 @@ BEGIN
         a.PasswordHash AS passwordHash,
         a.PasswordSalt AS passwordSalt,
         u.Role AS role,
-        ISNULL(u.UserId, 0) AS userId,
+        u.UserId AS userId,
         u.FirstName AS User_firstName,
         u.MiddleName AS User_middleName,
         u.LastName AS User_lastName,
         u.ContactNumber AS User_contactNumber,
         u.Address AS User_address,
-        CASE WHEN u.Role = 'Nurse' THEN ISNULL(u.UserId, 0) ELSE 0 END AS nurseId,
-        CASE WHEN u.Role = 'Nurse' THEN ISNULL(u.FirstName, '') ELSE '' END AS Nurse_firstName,
-        CASE WHEN u.Role = 'Nurse' THEN ISNULL(u.MiddleName, '') ELSE '' END AS Nurse_middleName,
-        CASE WHEN u.Role = 'Nurse' THEN ISNULL(u.LastName, '') ELSE '' END AS Nurse_lastName,
-        CASE WHEN u.Role = 'Nurse' THEN ISNULL(u.ContactNumber, '') ELSE '' END AS Nurse_contactNumber
+        CAST(NULL AS INT) AS nurseId,
+        CAST(NULL AS NVARCHAR(100)) AS Nurse_firstName,
+        CAST(NULL AS NVARCHAR(100)) AS Nurse_middleName,
+        CAST(NULL AS NVARCHAR(100)) AS Nurse_lastName,
+        CAST(NULL AS NVARCHAR(20)) AS Nurse_contactNumber
     FROM [Auth] a
     LEFT JOIN [Users] u ON a.AuthId = u.AuthId
     WHERE a.Email = @email
@@ -98,72 +95,16 @@ END;
 GO
 
 
-CREATE OR ALTER PROCEDURE dbo.asp_CreateNurse
-    @userName NVARCHAR(100),
-    @passwordHash VARBINARY(MAX),
-    @passwordSalt VARBINARY(MAX),
-    @email NVARCHAR(255),
-    @createdBy NVARCHAR(100),
-    @updatedOn DATETIME,
-    @updatedBy NVARCHAR(100),
-    @isActive BIT,
-    @firstName NVARCHAR(100),
-    @middleName NVARCHAR(100),
-    @lastName NVARCHAR(100),
-    @contactNumber NVARCHAR(20)
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    IF EXISTS (SELECT 1 FROM [Auth] WHERE Email = @email)
-    BEGIN
-        -- RAISERROR is used for compatibility with SQL Server versions older than 2012.
-        RAISERROR ('Email already existing', 16, 1);
-        RETURN;
-    END
- 
-    BEGIN TRY
-        BEGIN TRANSACTION;
-
-        DECLARE @NewAuthId INT;
-
-        INSERT INTO [Auth] (UserName, PasswordHash, PasswordSalt, Email, CreatedBy, UpdatedOn, UpdatedBy, IsActive)
-        VALUES (@userName, @passwordHash, @passwordSalt, @email, @createdBy, @updatedOn, @updatedBy, @isActive);
-
-        SET @NewAuthId = SCOPE_IDENTITY();
-
-        INSERT INTO [Users] (AuthId, FirstName, MiddleName, LastName, ContactNumber, Address, Role, CreatedBy, UpdatedOn, UpdatedBy, IsActive)
-        VALUES (@NewAuthId, @firstName, @middleName, @lastName, @contactNumber, NULL, 'Nurse', @createdBy, @updatedOn, @updatedBy, @isActive);
-
-        COMMIT TRANSACTION;
-
-        SELECT @NewAuthId;
-    END TRY
-    BEGIN CATCH
-        IF @@TRANCOUNT > 0
-            ROLLBACK TRANSACTION;
-
-        -- Re-throw the original error for the application to handle
-        DECLARE @ErrorMessage NVARCHAR(4000);
-        DECLARE @ErrorSeverity INT;
-        DECLARE @ErrorState INT;
-
-        SELECT 
-            @ErrorMessage = ERROR_MESSAGE(),
-            @ErrorSeverity = ERROR_SEVERITY(),
-            @ErrorState = ERROR_STATE();
-        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
-    END CATCH
-END;
+IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = 'usp_CreateSessionToken')
+    DROP PROCEDURE dbo.usp_CreateSessionToken;
 GO
 
-
-CREATE OR ALTER PROCEDURE dbo.usp_CreateSessionToken
+CREATE PROCEDURE dbo.usp_CreateSessionToken
     @authId INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    
+
     -- Deactivate any previously active tokens for this user
     UPDATE [SessionToken] SET IsActive = 0 WHERE AuthId = @authId AND IsActive = 1;
 
@@ -173,24 +114,28 @@ BEGIN
     INSERT INTO [SessionToken] (Token, AuthId, ExpiresOn, IsActive)
     VALUES (@NewToken, @authId, @ExpiresOn, 1);
 
-    SELECT 
-        TokenId AS tokenId, 
-        Token AS token, 
-        AuthId AS authId, 
-        ExpiresOn AS expiresOn, 
+    SELECT
+        TokenId AS tokenId,
+        Token AS token,
+        AuthId AS authId,
+        ExpiresOn AS expiresOn,
         CAST(IsActive AS INT) AS isActive -- C# maps this to int
-    FROM [SessionToken] 
+    FROM [SessionToken]
     WHERE TokenId = SCOPE_IDENTITY();
 END;
 GO
 
 
-CREATE OR ALTER PROCEDURE dbo.usp_UpdateSessionToken
+IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = 'usp_UpdateSessionToken')
+    DROP PROCEDURE dbo.usp_UpdateSessionToken;
+GO
+
+CREATE PROCEDURE dbo.usp_UpdateSessionToken
     @authId INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    
+
     DECLARE @NewToken VARBINARY(64) = CRYPT_GEN_RANDOM(64);
     DECLARE @ExpiresOn DATETIME = DATEADD(HOUR, 2, GETUTCDATE());
 
@@ -198,19 +143,23 @@ BEGIN
     SET Token = @NewToken, ExpiresOn = @ExpiresOn
     WHERE AuthId = @authId AND IsActive = 1 AND ExpiresOn > GETUTCDATE();
 
-    SELECT 
-        TokenId AS tokenId, 
-        Token AS token, 
-        AuthId AS authId, 
-        ExpiresOn AS expiresOn, 
+    SELECT
+        TokenId AS tokenId,
+        Token AS token,
+        AuthId AS authId,
+        ExpiresOn AS expiresOn,
         CAST(IsActive AS INT) AS isActive
-    FROM [SessionToken] 
+    FROM [SessionToken]
     WHERE AuthId = @authId AND IsActive = 1 AND Token = @NewToken;
 END;
 GO
 
 
-CREATE OR ALTER PROCEDURE dbo.usp_EndSessionToken
+IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = 'usp_EndSessionToken')
+    DROP PROCEDURE dbo.usp_EndSessionToken;
+GO
+
+CREATE PROCEDURE dbo.usp_EndSessionToken
     @Token VARBINARY(64)
 AS
 BEGIN
@@ -222,13 +171,17 @@ END;
 GO
 
 
-CREATE OR ALTER PROCEDURE dbo.usp_ValidateSessionToken
+IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = 'usp_ValidateSessionToken')
+    DROP PROCEDURE dbo.usp_ValidateSessionToken;
+GO
+
+CREATE PROCEDURE dbo.usp_ValidateSessionToken
     @authId INT
 AS
 BEGIN
     SET NOCOUNT ON;
     DECLARE @IsValid BIT = 0;
-    
+
     IF EXISTS (SELECT 1 FROM [SessionToken] WHERE AuthId = @authId AND IsActive = 1 AND ExpiresOn > GETUTCDATE())
     BEGIN
         SET @IsValid = 1;
@@ -239,12 +192,16 @@ END;
 GO
 
 
-CREATE OR ALTER PROCEDURE sp_ValidateSessionTokenAndGetRole
+IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = 'sp_ValidateSessionTokenAndGetRole')
+    DROP PROCEDURE dbo.sp_ValidateSessionTokenAndGetRole;
+GO
+
+CREATE PROCEDURE dbo.sp_ValidateSessionTokenAndGetRole
     @Token VARBINARY(64)
 AS
 BEGIN
     SET NOCOUNT ON;
-    
+
     SELECT u.Role
     FROM [SessionToken] st
     INNER JOIN [Auth] a ON st.AuthId = a.AuthId
