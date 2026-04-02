@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NurseRecordingSystem.Contracts.ServiceContracts.Auth;
 using NurseRecordingSystem.Controllers.AuthenticationControllers;
@@ -12,14 +13,17 @@ namespace NurseRecordingSystemTest.ControllerTest
     {
         private readonly Mock<IUserAuthenticationService> _mockAuthService;
         private readonly Mock<ISessionTokenService> _mockTokenService;
+        private readonly Mock<ILogger<AuthController>> _mockLogger;
         private readonly AuthController _authController;
 
         public AuthControllerTest()
         {
             _mockAuthService = new Mock<IUserAuthenticationService>();
             _mockTokenService = new Mock<ISessionTokenService>();
+            _mockLogger = new Mock<ILogger<AuthController>>();
 
             _authController = new AuthController(
+                _mockLogger.Object,
                 _mockAuthService.Object,
                 _mockTokenService.Object
             )

@@ -320,3 +320,14 @@ D:\Projects\Practice Projects\C#\NurseRecordingSystemWhole\NurseRecordingSystemT
 D:\Projects\Practice Projects\C#\NurseRecordingSystemWhole\NurseRecordingSystemTest\obj\Debug\net8.0\NurseRecordingSystemTest.pdb
 D:\Projects\Practice Projects\C#\NurseRecordingSystemWhole\NurseRecordingSystemTest\obj\Debug\net8.0\NurseRecordingSystemTest.genruntimeconfig.cache
 D:\Projects\Practice Projects\C#\NurseRecordingSystemWhole\NurseRecordingSystemTest\obj\Debug\net8.0\ref\NurseRecordingSystemTest.dll
+C:\Users\revon\source\repos\Nurse-Recording-System-RE\Tests\obj\Debug\net8.0\NurseRecordingSystemTest.csproj.AssemblyReference.cache
+C:\Users\revon\source\repos\Nurse-Recording-System-RE\Tests\obj\Debug\net8.0\NurseRecordingSystemTest.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\revon\source\repos\Nurse-Recording-System-RE\Tests\obj\Debug\net8.0\NurseRecordingSystemTest.AssemblyInfoInputs.cache
+C:\Users\revon\source\repos\Nurse-Recording-System-RE\Tests\obj\Debug\net8.0\NurseRecordingSystemTest.AssemblyInfo.cs
+C:\Users\revon\source\repos\Nurse-Recording-System-RE\Tests\obj\Debug\net8.0\NurseRecordingSystemTest.csproj.CoreCompileInputs.cache
+C:\Users\revon\source\repos\Nurse-Recording-System-RE\Tests\obj\Debug\net8.0\NurseRecordingSystemTest.sourcelink.json
+C:\Users\revon\source\repos\Nurse-Recording-System-RE\Tests\obj\Debug\net8.0\NurseRecordingSystemTest.dll
+C:\Users\revon\source\repos\Nurse-Recording-System-RE\Tests\obj\Debug\net8.0\refint\NurseRecordingSystemTest.dll
+C:\Users\revon\source\repos\Nurse-Recording-System-RE\Tests\obj\Debug\net8.0\NurseRecordingSystemTest.pdb
+C:\Users\revon\source\repos\Nurse-Recording-System-RE\Tests\bin\Debug\net8.0\.msCoverageSourceRootsMapping_NurseRecordingSystemTest
+C:\Users\revon\source\repos\Nurse-Recording-System-RE\Tests\bin\Debug\net8.0\CoverletSourceRootsMapping_NurseRecordingSystemTest
