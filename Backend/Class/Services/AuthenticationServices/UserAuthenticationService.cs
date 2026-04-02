@@ -37,7 +37,7 @@ namespace NurseRecordingSystem.Class.Services.Authentication
             {
                 // Dapper Row maps fields dynamically
                 var userRow = await connection.QueryFirstOrDefaultAsync(
-                    "dbo.ausp_LoginUserAuth",
+                    "dbo.usp_LoginUserAuth",
                     new { email = request.Email },
                     commandType: System.Data.CommandType.StoredProcedure
                 );

@@ -101,7 +101,7 @@ namespace NurseRecordingSystem.Controllers.AuthenticationControllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error in Login: {ex.Message}");
+                return StatusCode(500, new { message = $"Error in Login: {ex.Message}" });
             }
         }
         #endregion
@@ -138,7 +138,7 @@ namespace NurseRecordingSystem.Controllers.AuthenticationControllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error in Logout: {ex.Message}");
+                return StatusCode(500, new { message = $"Error in Logout: {ex.Message}" });
             }
         }
         #endregion
