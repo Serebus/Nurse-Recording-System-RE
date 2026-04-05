@@ -38,6 +38,24 @@ namespace NurseRecordingSystem.Test.ControllerTest.HelperControllerTest
         }
 
         [Fact]
+        public async Task ViewAllStatus_NoRecordsFound_ReturnsOkWithMessage()
+        {
+            // Arrange
+            _mockViewService.Setup(IViewClinicStatus => IViewClinicStatus.ViewAllAsync())
+                .ReturnsAsync(new List<ViewClinicStatusResponseDTO>());
+
+            // Act
+            var result = await _controller.ViewAllStatus() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+            Assert.NotNull(result.Value);
+            
+            Assert.Equal("No clinic status records found.", result.Value.GetType().GetProperty("message")?.GetValue(result.Value, null)?.ToString());
+        }
+
+        [Fact]
         public async Task ViewAllStatus_ExceptionThrown_ReturnsInternalServerError()
         {
             // Arrange
