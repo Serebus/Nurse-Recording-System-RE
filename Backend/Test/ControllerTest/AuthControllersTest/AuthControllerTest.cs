@@ -183,5 +183,78 @@ namespace NurseRecordingSystemTest.ControllerTest
             Assert.NotNull(result.Value);
             Assert.Contains("Error in Login: Database connection failed", result.Value?.ToString());
         }
+
+        // Successful logout test
+        [Fact]
+        public async Task LogoutUser_ValidToken_ReturnsOkResult()
+        {
+            // --- Arrange ---
+            var base64Token = Convert.ToBase64String(new byte[] { 1, 2, 3, 4, 5 });
+            _authController.ControllerContext.HttpContext.Request.Headers["Cookie"] = $"SessionToken={base64Token}";
+
+            _mockTokenService.Setup(s => s.EndSessionAsync(It.IsAny<byte[]>()))
+                .ReturnsAsync(true);
+
+            // --- Act ---
+            var result = await _authController.LogoutUser() as OkObjectResult;
+
+            // --- Assert ---
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+            Assert.Equal("Logout successful.", result.Value);
+        }
+
+        // Logout with no token test (already logged out)
+        [Fact]
+        public async Task LogoutUser_NoToken_ReturnsOkResult_AlreadyLoggedOut()
+        {
+            // --- Arrange ---
+            // No cookie added to the request headers
+
+            // --- Act ---
+            var result = await _authController.LogoutUser() as OkObjectResult;
+
+            // --- Assert ---
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+            Assert.Equal("Already logged out.", result.Value);
+        }
+
+        // Logout with invalid token format test
+        [Fact]
+        public async Task LogoutUser_InvalidTokenFormat_ReturnsBadRequest()
+        {
+            // --- Arrange ---
+            _authController.ControllerContext.HttpContext.Request.Headers["Cookie"] = "SessionToken=invalid_base64_format!";
+
+            // --- Act ---
+            var result = await _authController.LogoutUser() as BadRequestObjectResult;
+
+            // --- Assert ---
+            Assert.NotNull(result);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Equal("Invalid session token format.", result.Value);
+        }
+
+        // Server error during logout test
+        [Fact]
+        public async Task LogoutUser_ExceptionThrown_ReturnsServerError()
+        {
+            // --- Arrange ---
+            var base64Token = Convert.ToBase64String(new byte[] { 1, 2, 3 });
+            _authController.ControllerContext.HttpContext.Request.Headers["Cookie"] = $"SessionToken={base64Token}";
+
+            _mockTokenService.Setup(s => s.EndSessionAsync(It.IsAny<byte[]>()))
+                .ThrowsAsync(new Exception("Database connection failed"));
+
+            // --- Act ---
+            var result = await _authController.LogoutUser() as ObjectResult;
+
+            // --- Assert ---
+            Assert.NotNull(result);
+            Assert.Equal(500, result.StatusCode);
+            Assert.NotNull(result.Value);
+            Assert.Contains("Error in Logout: Database connection failed", result.Value?.ToString());
+        }
     }
 }
