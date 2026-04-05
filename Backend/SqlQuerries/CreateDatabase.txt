@@ -70,3 +70,11 @@ CREATE TABLE [PatientForm] (
     IsActive BIT DEFAULT 1
 );
 GO
+
+-- Clinic Status Table
+CREATE TABLE [dbo].[ClinicStatus] (
+    [LogId] INT IDENTITY(1,1) PRIMARY KEY,
+    [Status] BIT NOT NULL,
+    [CreatedOn] DATETIME DEFAULT GETDATE() -- Good practice to know when the status was changed
+);
+GO

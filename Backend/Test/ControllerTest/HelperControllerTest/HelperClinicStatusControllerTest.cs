@@ -49,7 +49,8 @@ namespace NurseRecordingSystem.Test.ControllerTest.HelperControllerTest
             // Assert
             Assert.NotNull(result);
             Assert.Equal(500, result.StatusCode);
-            Assert.Contains("Database error", result.Value?.ToString());
+            Assert.NotNull(result.Value);
+            Assert.Contains("Database error", result.Value.GetType().GetProperty("message")?.GetValue(result.Value, null)?.ToString());
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿﻿using Microsoft.AspNetCore.Mvc;
 using NurseRecordingSystem.Contracts.ServiceContracts.IHelperServices.IHelperClinicStatus;
 
 [Route("api/helper/clinicstatus")]
@@ -22,7 +22,7 @@ public class HelperClinicStatusController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
         }
     }
 }

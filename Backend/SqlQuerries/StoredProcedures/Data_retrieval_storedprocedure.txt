@@ -67,3 +67,21 @@ BEGIN
     WHERE (@IsActive IS NULL OR u.IsActive = @IsActive);
 END;
 GO
+
+
+CREATE PROCEDURE [dbo].[hsp_ViewClinicStatus]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Replace [ClinicStatus] with your actual table name
+    -- if it is different in your database.
+    SELECT 
+        LogId, 
+        Status 
+    FROM 
+        [dbo].[ClinicStatus]
+    ORDER BY 
+        LogId DESC; -- Optional: orders by newest first
+END;
+GO
