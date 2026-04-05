@@ -47,7 +47,7 @@ Software Engineering I
 1. Open a terminal or command prompt in the project's root directory.
 2. Run the following command to start the API server:
    ```bash
-   dotnet run
+   dotnet run --launch-profile https
    ```
 3. The API will be running on the port specified in the `Properties/launchSettings.json` file (usually `https://localhost:5001` or `http://localhost:5000`). You can access the Swagger UI at `https://localhost:<port>/swagger/index.html`.
 
