@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+﻿﻿using Microsoft.Data.SqlClient;
 using NurseRecordingSystem.Class.Services.HelperServices.HelperAuthentication;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.NurseCreation;
 using NurseRecordingSystem.Model.DTO.NurseServicesDTOs.NurseCreation;
@@ -35,9 +35,6 @@ namespace NurseRecordingSystem.Class.Services.NurseServices.NurseCreation
                 cmd.Parameters.AddWithValue("@passwordSalt", passwordSalt);
                 cmd.Parameters.AddWithValue("@email", request.Email);
                 cmd.Parameters.AddWithValue("@createdBy", "Admin");
-                cmd.Parameters.AddWithValue("@updatedOn", DateTime.UtcNow);
-                cmd.Parameters.AddWithValue("@updatedBy", "Admin");
-                cmd.Parameters.AddWithValue("@isActive", 1);
 
                 // Parameters for [Users] table
                 cmd.Parameters.AddWithValue("@firstName", request.FirstName);

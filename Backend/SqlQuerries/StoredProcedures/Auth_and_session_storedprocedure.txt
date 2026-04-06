@@ -209,3 +209,57 @@ BEGIN
     WHERE st.Token = @Token AND st.IsActive = 1 AND st.ExpiresOn > GETUTCDATE();
 END;
 GO
+
+CREATE PROCEDURE dbo.asp_CreateNurse
+    @userName NVARCHAR(100),
+    @passwordHash VARBINARY(MAX),
+    @passwordSalt VARBINARY(MAX),
+    @email NVARCHAR(255),
+    @firstName NVARCHAR(100),
+    @middleName NVARCHAR(100) = NULL,
+    @lastName NVARCHAR(100),
+    @contactNumber NVARCHAR(20) = NULL,
+    @address NVARCHAR(MAX) = NULL,
+    @createdBy NVARCHAR(100) = 'System'
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- 1. Check if the email is already registered 
+    -- (Throws error 50005 so your C# backend catches it as an InvalidOperationException)
+    IF EXISTS (SELECT 1 FROM [Auth] WHERE Email = @email)
+    BEGIN
+        ;THROW 50005, 'Email already exists.', 1;
+    END
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        DECLARE @NewAuthId INT;
+
+        -- 2. Insert into the Auth Table
+        INSERT INTO [Auth] (UserName, PasswordHash, PasswordSalt, Email, CreatedBy, CreatedOn, IsActive)
+        VALUES (@userName, @passwordHash, @passwordSalt, @email, @createdBy, GETUTCDATE(), 1);
+
+        SET @NewAuthId = SCOPE_IDENTITY();
+
+        -- 3. Insert into the Users Table with the Role explicitly set to 'Nurse'
+        INSERT INTO [Users] (AuthId, FirstName, MiddleName, LastName, ContactNumber, Address, Role, CreatedBy, CreatedOn, IsActive)
+        VALUES (@NewAuthId, @firstName, @middleName, @lastName, @contactNumber, @address, 'Nurse', @createdBy, GETUTCDATE(), 1);
+
+        COMMIT TRANSACTION;
+
+        -- 4. Return the newly created AuthId back to the C# service
+        SELECT @NewAuthId AS AuthId;
+
+    END TRY
+    BEGIN CATCH
+        -- Rollback the transaction if anything fails (e.g., truncation, missing fields)
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        
+        -- Rethrow the actual SQL error so the C# API can log it
+        ;THROW;
+    END CATCH
+END;
+GO

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.NurseCreation;
 using NurseRecordingSystem.Model.DTO.NurseServicesDTOs.NurseCreation;
@@ -55,7 +55,11 @@ namespace NurseRecordingSystem.API.Controllers
             {
                 return StatusCode(
                     StatusCodes.Status500InternalServerError,
-                    new { Error = "Account creation failed due to internal error.", Detail = ex.Message }
+                    new { 
+                        Error = "Account creation failed due to internal error.", 
+                        Detail = ex.Message,
+                        InnerDetail = ex.InnerException?.Message 
+                    }
                 );
             }
         }
