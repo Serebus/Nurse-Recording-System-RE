@@ -23,8 +23,8 @@ namespace NurseRecordingSystem.Test.ControllerTest.HelperControllerTest
             // Arrange
             var expectedList = new List<ViewAllMedecineStockResponseDTO>
             {
-                new ViewAllMedecineStockResponseDTO { MedicineId = 1, MedecineName = "Aspirin", MedecineDescription = "Pain reliever", NumberOfStock = 100 },
-                new ViewAllMedecineStockResponseDTO { MedicineId = 2, MedecineName = "Ibuprofen", MedecineDescription = "Anti-inflammatory", NumberOfStock = 50 }
+                new ViewAllMedecineStockResponseDTO { MedicineId = 1, MedicineName = "Aspirin", MedicineDescription = "Pain reliever", NumberOfStock = 100 },
+                new ViewAllMedecineStockResponseDTO { MedicineId = 2, MedicineName = "Ibuprofen", MedicineDescription = "Anti-inflammatory", NumberOfStock = 50 }
             };
             _mockViewService.Setup(service => service.ViewAllAsync()).ReturnsAsync(expectedList);
 

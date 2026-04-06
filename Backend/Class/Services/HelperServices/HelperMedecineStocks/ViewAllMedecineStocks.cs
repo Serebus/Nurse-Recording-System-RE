@@ -32,8 +32,8 @@ namespace NurseRecordingSystem.Class.Services.MedecineStockServices
                         stockList.Add(new ViewAllMedecineStockResponseDTO
                         {
                             MedicineId = reader.GetInt32(reader.GetOrdinal("medicineId")),
-                            MedecineName = reader.GetString(reader.GetOrdinal("medecineName")),
-                            MedecineDescription = reader.GetString(reader.GetOrdinal("medecineDescription")),
+                            MedicineName = reader.GetString(reader.GetOrdinal("medecineName")),
+                            MedicineDescription = reader.GetString(reader.GetOrdinal("medecineDescription")),
                             NumberOfStock = reader.GetInt32(reader.GetOrdinal("numberOfStock"))
                         });
                     }
