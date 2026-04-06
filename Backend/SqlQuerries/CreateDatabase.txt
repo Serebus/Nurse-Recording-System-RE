@@ -78,3 +78,18 @@ CREATE TABLE [dbo].[ClinicStatus] (
     [CreatedOn] DATETIME DEFAULT GETDATE() 
 );
 GO
+
+-- Medecine Stock Table
+CREATE TABLE [MedecineStock] (
+    StockId INT IDENTITY(1,1) PRIMARY KEY,
+    MedicineName NVARCHAR(200) NOT NULL,
+    Description NVARCHAR(MAX),
+    Quantity INT NOT NULL DEFAULT 0,
+    ExpirationDate DATE,
+    CreatedOn DATETIME DEFAULT GETUTCDATE(),
+    CreatedBy NVARCHAR(100),
+    UpdatedOn DATETIME,
+    UpdatedBy NVARCHAR(100),
+    IsActive BIT DEFAULT 1
+);
+GO

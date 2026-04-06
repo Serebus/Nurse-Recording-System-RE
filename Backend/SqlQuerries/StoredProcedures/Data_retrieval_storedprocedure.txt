@@ -85,3 +85,27 @@ BEGIN
         LogId DESC; -- Optional: orders by newest first
 END;
 GO
+
+IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = 'hsp_ViewAllMedecineStock')
+    DROP PROCEDURE dbo.hsp_ViewAllMedecineStock;
+GO
+
+CREATE PROCEDURE [dbo].[hsp_ViewAllMedecineStock]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        StockId AS medicineId,
+        MedicineName AS medicineName,
+        Description AS medecineDescription,
+        Quantity AS numberOfStock,
+        ExpirationDate AS expirationDate,
+        CreatedOn AS createdOn,
+        CreatedBy AS createdBy,
+        UpdatedOn AS updatedOn,
+        UpdatedBy AS updatedBy,
+        IsActive AS isActive
+    FROM [dbo].[MedecineStock];
+END;
+GO
