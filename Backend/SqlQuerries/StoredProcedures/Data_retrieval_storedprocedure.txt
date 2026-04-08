@@ -48,14 +48,13 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
-        u.UserId AS userId,
-        a.UserName AS userName,
+        u.UserId AS id,
         a.Email AS email,
         u.Role AS role,
-        u.FirstName AS firstName,
-        u.MiddleName AS middleName,
-        u.LastName AS lastName,
-        u.ContactNumber AS contactNumber,
+        u.FirstName AS firstname,
+        u.MiddleName AS middlename,
+        u.LastName AS lastname,
+        u.ContactNumber AS emergencyNumber,
         u.Address AS address,
         u.IsActive AS isActive,
         u.CreatedOn AS createdOn,
@@ -125,4 +124,3 @@ BEGIN
     SELECT SCOPE_IDENTITY() AS LogId;
 END;
 GO
-

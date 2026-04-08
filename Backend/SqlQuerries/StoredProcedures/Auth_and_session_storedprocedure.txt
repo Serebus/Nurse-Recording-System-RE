@@ -7,7 +7,6 @@ IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = 'usp_CreateUserAndAuth')
 GO
 
 CREATE PROCEDURE dbo.usp_CreateUserAndAuth
-    @userName NVARCHAR(100),
     @passwordHash VARBINARY(MAX),
     @passwordSalt VARBINARY(MAX),
     @email NVARCHAR(255),
@@ -18,7 +17,7 @@ CREATE PROCEDURE dbo.usp_CreateUserAndAuth
     @firstName NVARCHAR(100),
     @middleName NVARCHAR(100),
     @lastName NVARCHAR(100),
-    @contactNumber NVARCHAR(20),
+    @emergencyNumber NVARCHAR(20),
     @address NVARCHAR(MAX)
 AS
 BEGIN
@@ -37,17 +36,21 @@ BEGIN
         DECLARE @NewAuthId INT;
 
         INSERT INTO [Auth] (UserName, PasswordHash, PasswordSalt, Email, CreatedBy, UpdatedOn, UpdatedBy, IsActive)
-        VALUES (@userName, @passwordHash, @passwordSalt, @email, @createdBy, @updatedOn, @updatedBy, @isActive);
+        VALUES (@email, @passwordHash, @passwordSalt, @email, @createdBy, @updatedOn, @updatedBy, @isActive);
 
         SET @NewAuthId = SCOPE_IDENTITY();
+        
+        DECLARE @NewUserId INT;
 
         INSERT INTO [Users] (AuthId, FirstName, MiddleName, LastName, ContactNumber, Address, Role, CreatedBy, UpdatedOn, UpdatedBy, IsActive)
-        VALUES (@NewAuthId, @firstName, @middleName, @lastName, @contactNumber, @address, 'User', @createdBy, @updatedOn, @updatedBy, @isActive);
+        VALUES (@NewAuthId, @firstName, @middleName, @lastName, @emergencyNumber, @address, 'User', @createdBy, @updatedOn, @updatedBy, @isActive);
+        
+        SET @NewUserId = SCOPE_IDENTITY();
 
         COMMIT TRANSACTION;
 
-        -- Return new AuthId to execute via ExecuteScalarAsync
-        SELECT @NewAuthId;
+        -- Return new UserId to execute via ExecuteScalarAsync (Maps perfectly to Vue's 'id')
+        SELECT @NewUserId;
 
     END TRY
     BEGIN CATCH
