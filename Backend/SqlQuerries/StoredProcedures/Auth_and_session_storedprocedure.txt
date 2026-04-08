@@ -10,53 +10,70 @@ CREATE PROCEDURE dbo.usp_CreateUserAndAuth
     @passwordHash VARBINARY(MAX),
     @passwordSalt VARBINARY(MAX),
     @email NVARCHAR(255),
-    @createdBy NVARCHAR(100),
+    @createdBy NVARCHAR(50),
     @updatedOn DATETIME,
-    @updatedBy NVARCHAR(100),
+    @updatedBy NVARCHAR(50),
     @isActive BIT,
-    @firstName NVARCHAR(100),
-    @middleName NVARCHAR(100),
-    @lastName NVARCHAR(100),
-    @emergencyNumber NVARCHAR(20),
-    @address NVARCHAR(MAX)
+    @firstName NVARCHAR(50),
+    @lastName NVARCHAR(50),
+    @emergencyContact NVARCHAR(20),
+    @address NVARCHAR(255),
+    @facebook NVARCHAR(255) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Check for email existence (matching C# exception handling)
+    DECLARE @AuthId INT;
+
+    -- First, check if the email already exists to provide a clean error.
     IF EXISTS (SELECT 1 FROM [Auth] WHERE Email = @email)
     BEGIN
         RAISERROR('Email already existing', 16, 1);
-        RETURN;
+        RETURN -1; -- Indicates failure
     END
 
     BEGIN TRY
         BEGIN TRANSACTION;
+        -- 1. Insert into the Auth table
+        -- We use the email for the UserName column to satisfy the schema, as it's no longer sent from the app.
+        INSERT INTO dbo.Auth (
+            UserName,
+            PasswordHash,
+            PasswordSalt,
+            Email,
+            CreatedBy,
+            CreatedOn,
+            UpdatedBy,
+            UpdatedOn,
+            IsActive
+        )
+        VALUES (
+            @email, -- Using email for UserName
+            @passwordHash,
+            @passwordSalt,
+            @email,
+            @createdBy,
+            GETUTCDATE(), -- Use the server's UTC time for consistency
+            @updatedBy,
+            @updatedOn,
+            @isActive
+        );
 
-        DECLARE @NewAuthId INT;
+        SET @AuthId = SCOPE_IDENTITY();
 
-        INSERT INTO [Auth] (UserName, PasswordHash, PasswordSalt, Email, CreatedBy, UpdatedOn, UpdatedBy, IsActive)
-        VALUES (@email, @passwordHash, @passwordSalt, @email, @createdBy, @updatedOn, @updatedBy, @isActive);
-
-        SET @NewAuthId = SCOPE_IDENTITY();
-        
-        DECLARE @NewUserId INT;
-
-        INSERT INTO [Users] (AuthId, FirstName, MiddleName, LastName, ContactNumber, Address, Role, CreatedBy, UpdatedOn, UpdatedBy, IsActive)
-        VALUES (@NewAuthId, @firstName, @middleName, @lastName, @emergencyNumber, @address, 'User', @createdBy, @updatedOn, @updatedBy, @isActive);
-        
-        SET @NewUserId = SCOPE_IDENTITY();
+        -- 2. Insert into the Users table using the updated schema columns
+        INSERT INTO dbo.Users (AuthId, FirstName, MiddleName, LastName, EmergencyContact, Address, Facebook, Role)
+        VALUES (@AuthId, @firstName, NULL, @lastName, @emergencyContact, @address, @facebook, 'User');
 
         COMMIT TRANSACTION;
 
-        -- Return new UserId to execute via ExecuteScalarAsync (Maps perfectly to Vue's 'id')
-        SELECT @NewUserId;
-
+        -- Return the new AuthId on success, which the C# service expects
+        SELECT @AuthId;
     END TRY
     BEGIN CATCH
         IF @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
-        RAISERROR('Error creating user and auth', 16, 1);
+        ;THROW; -- Re-throw the original error so the C# application can catch it
     END CATCH
 END;
 GO
@@ -83,8 +100,9 @@ BEGIN
         u.FirstName AS User_firstName,
         u.MiddleName AS User_middleName,
         u.LastName AS User_lastName,
-        u.ContactNumber AS User_contactNumber,
+        u.EmergencyContact AS User_emergencyContact,
         u.Address AS User_address,
+        u.Facebook AS User_facebook,
         CAST(NULL AS INT) AS nurseId,
         CAST(NULL AS NVARCHAR(100)) AS Nurse_firstName,
         CAST(NULL AS NVARCHAR(100)) AS Nurse_middleName,
@@ -247,7 +265,7 @@ BEGIN
         SET @NewAuthId = SCOPE_IDENTITY();
 
         -- 3. Insert into the Users Table with the Role explicitly set to 'Nurse'
-        INSERT INTO [Users] (AuthId, FirstName, MiddleName, LastName, ContactNumber, Address, Role, CreatedBy, CreatedOn, IsActive)
+        INSERT INTO [Users] (AuthId, FirstName, MiddleName, LastName, EmergencyContact, Address, Role, CreatedBy, CreatedOn, IsActive)
         VALUES (@NewAuthId, @firstName, @middleName, @lastName, @contactNumber, @address, 'Nurse', @createdBy, GETUTCDATE(), 1);
 
         COMMIT TRANSACTION;

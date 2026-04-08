@@ -7,8 +7,6 @@ namespace NurseRecordingSystem.DTO.UserServiceDTOs.UsersDTOs
         [Required]
         public string FirstName { get; set; } = null!;
 
-        public string? MiddleName { get; set; }
-
         [Required]
         public string Address { get; set; } = null!;
 
@@ -17,7 +15,9 @@ namespace NurseRecordingSystem.DTO.UserServiceDTOs.UsersDTOs
 
         [Required]
         [Phone(ErrorMessage = "Invalid phone number format.")]
-        public string ContactNumber { get; set; } = null!;
+        public string EmergencyContact { get; set; } = string.Empty;
+
+        public string? Facebook { get; set; }
 
         [Required]
         public int AuthId { get; set; }

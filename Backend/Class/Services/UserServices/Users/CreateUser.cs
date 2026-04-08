@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+﻿﻿﻿﻿using Microsoft.Data.SqlClient;
 using NurseRecordingSystem.Class.Services.HelperServices.HelperAuthentication;
 using NurseRecordingSystem.Contracts.ServiceContracts.IUserServices.Users;
 using NurseRecordingSystem.DTO.UserServiceDTOs.UsersDTOs;
@@ -31,7 +31,6 @@ namespace NurseRecordingSystem.Class.Services.UserServices.Users
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                 // Parameters for [Auth] table
-                cmd.Parameters.AddWithValue("@userName", authRequest.UserName);
                 cmd.Parameters.AddWithValue("@passwordHash", PasswordHash);
                 cmd.Parameters.AddWithValue("@passwordSalt", passwordSalt);
                 cmd.Parameters.AddWithValue("@email", authRequest.Email);
@@ -42,10 +41,10 @@ namespace NurseRecordingSystem.Class.Services.UserServices.Users
 
                 // Parameters for [Users] table
                 cmd.Parameters.AddWithValue("@firstName", user.FirstName);
-                cmd.Parameters.AddWithValue("@middleName", user.MiddleName);
                 cmd.Parameters.AddWithValue("@lastName", user.LastName);
-                cmd.Parameters.AddWithValue("@contactNumber", user.ContactNumber);
+                cmd.Parameters.AddWithValue("@emergencyContact", user.EmergencyContact);
                 cmd.Parameters.AddWithValue("@address", user.Address);
+                cmd.Parameters.AddWithValue("@facebook", (object?)user.Facebook ?? DBNull.Value);
 
                 try
                 {
@@ -66,7 +65,7 @@ namespace NurseRecordingSystem.Class.Services.UserServices.Users
                 }
                 catch (SqlException ex)
                 {
-                    throw new Exception("Database ERROR occured during creating AUTH & USER", ex);
+                    throw new Exception($"Database ERROR occured during creating AUTH & USER: {ex.Message}", ex);
                 }
                 catch (Exception ex)
                 {

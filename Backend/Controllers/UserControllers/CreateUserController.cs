@@ -28,7 +28,6 @@ namespace NurseRecordingSystem.Controllers.UserControllers
             {
                 var authRequest = new CreateAuthenticationRequestDTO
                 {
-                    UserName = request.UserName,
                     Password = request.Password,
                     Email = request.Email
                 };
@@ -36,10 +35,10 @@ namespace NurseRecordingSystem.Controllers.UserControllers
                 var userRequest = new CreateUserRequestDTO
                 {
                     FirstName = request.FirstName,
-                    MiddleName = request.MiddleName,
                     LastName = request.LastName,
+                    EmergencyContact = request.EmergencyContact,
                     Address = request.Address,
-                    ContactNumber = request.ContactNumber
+                    Facebook = request.Facebook
                 };
                 var authId = await _createUsersService.CreateUserAuthenticateAsync(authRequest, userRequest);
                 //await _createUsersService.CreateUserAsync(userRequest);

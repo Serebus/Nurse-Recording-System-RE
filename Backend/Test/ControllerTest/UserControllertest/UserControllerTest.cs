@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.AspNetCore.Mvc;
+﻿﻿﻿﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NurseRecordingSystem.Contracts.ServiceContracts.IUserServices.Users;
 using NurseRecordingSystem.Controllers.UserControllers;
@@ -24,14 +24,13 @@ namespace NurseRecordingSystemTest.ControllerTest
 
             var combinedRequest = new CreateAuthenticationRequestDTO 
             {
-                UserName = "testuser",
                 Password = "Test@123",
                 Email = "testuser@gmail.com",
                 FirstName = "Test",
-                MiddleName = "T",
                 LastName = "User",
-                ContactNumber = "1234567890",
-                Address = "123 Test St"
+                EmergencyContact = "1234567890",
+                Address = "123 Test St",
+                Facebook = "https://facebook.com/testuser"
             };
 
             const int expectedAuthId = 42;
