@@ -109,3 +109,20 @@ BEGIN
     FROM [dbo].[MedecineStock];
 END;
 GO
+
+
+CREATE PROCEDURE [dbo].[asp_CreateClinicStatus]
+    @status BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Insert the new clinic status
+    INSERT INTO [dbo].[ClinicStatus] ([Status])
+    VALUES (@status);
+
+    -- Return the newly created LogId back to the C# application
+    SELECT SCOPE_IDENTITY() AS LogId;
+END;
+GO
+
