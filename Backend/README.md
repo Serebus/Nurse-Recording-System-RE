@@ -1,11 +1,11 @@
 # Overview
 The Patient Tracker System backend is a C# ASP.NET Core Web API designed to assist 
 communication between students and clinic nurses. It manages patient form submissions, 
-notifications, medicine inventory, and clinic status updates with real-time synchronization 
+notifications, and clinic status updates with real-time synchronization 
 across mobile and web clients.
 
 This system ensures that students can quickly report health issues while nurses receive timely notifications, 
-manage patient records, and keep the clinic�s operational status and inventory updated.
+manage patient records, and keep the clinics operational status updated.
 
 # NurseRecordingSystem
 A Project from ACLC College of Mandaue
@@ -50,4 +50,3 @@ Software Engineering I
    dotnet run --launch-profile https
    ```
 3. The API will be running on the port specified in the `Properties/launchSettings.json` file (usually `https://localhost:5001` or `http://localhost:5000`). You can access the Swagger UI at `https://localhost:<port>/swagger/index.html`.
-

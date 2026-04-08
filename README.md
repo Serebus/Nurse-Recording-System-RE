@@ -2,9 +2,9 @@
 
 A Project from ACLC College of Mandaue for Software Engineering I.
 
-The Patient Tracker System is a C# ASP.NET Core Web API and Vue 3 Vite frontend designed to assist communication between students and clinic nurses. It manages patient form submissions, notifications, medicine inventory, and clinic status updates with real-time synchronization across mobile and web clients.
+The Patient Tracker System is a C# ASP.NET Core Web API and Vue 3 Vite frontend designed to assist communication between students and clinic nurses. It manages patient form submissions, notifications, and clinic status updates with real-time synchronization across mobile and web clients.
 
-This system ensures that students can quickly report health issues while nurses receive timely notifications, manage patient records, and keep the clinic’s operational status and inventory updated.
+This system ensures that students can quickly report health issues while nurses receive timely notifications, manage patient records, and keep the clinic’s operational status updated.
 
 ## Features
 - User Authentication

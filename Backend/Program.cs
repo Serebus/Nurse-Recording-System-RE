@@ -6,7 +6,7 @@ using NurseRecordingSystem.Class.Repository;
 using NurseRecordingSystem.Class.Services.AdminServices.AdminAppointmentSchedule;
 using NurseRecordingSystem.Class.Services.Authentication;
 using NurseRecordingSystem.Class.Services.ClinicStatusServices;
-using NurseRecordingSystem.Class.Services.MedecineStockServices;
+// using NurseRecordingSystem.Class.Services.MedecineStockServices;
 using NurseRecordingSystem.Class.Services.NurseServices.AppointmentSchedules;
 using NurseRecordingSystem.Class.Services.NurseServices.NurseAppointmentSchedules;
 using NurseRecordingSystem.Class.Services.NurseServices.NurseCreation;
@@ -23,7 +23,7 @@ using NurseRecordingSystem.Contracts.ServiceContracts.IAdminServices.IAdminUser;
 using NurseRecordingSystem.Contracts.ServiceContracts.IHelperServices.IHelperClinicStatus;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INurseClinicStatus;
-using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INurseMedecineStock;
+// using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INurseMedecineStock;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INursePatientRecords;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INurseUserForms;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.INurseUsers;
@@ -79,10 +79,10 @@ builder.Services.AddScoped<IViewPatientRecord, ViewPatientRecord>();
 builder.Services.AddScoped<IViewPatientRecordList, ViewPatientRecordList>();
 builder.Services.AddScoped<IUpdatePatientRecord, UpdatePatientRecord>();
 //MedecineStock services
-builder.Services.AddScoped<ICreateMedecineStock, CreateMedecineStock>();
-builder.Services.AddScoped<IUpdateMedecineStock, UpdateMedecineStock>();
-builder.Services.AddScoped<IDeleteMedecineStock, DeleteMedecineStock>();
-builder.Services.AddScoped<IViewAllMedecineStocks, ViewAllMedecineStocks>();
+// builder.Services.AddScoped<ICreateMedecineStock, CreateMedecineStock>();
+// builder.Services.AddScoped<IUpdateMedecineStock, UpdateMedecineStock>();
+// builder.Services.AddScoped<IDeleteMedecineStock, DeleteMedecineStock>();
+// builder.Services.AddScoped<IViewAllMedecineStocks, ViewAllMedecineStocks>();
 //Clinic Status Services
 builder.Services.AddScoped<IUpdateClinicStatus, UpdateClinicStatus>();
 // Appointment Schedule Services Registration
