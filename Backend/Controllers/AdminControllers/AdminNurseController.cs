@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NurseRecordingSystem.Contracts.ServiceContracts.INurseServices.NurseCreation;
 using NurseRecordingSystem.Model.DTO.NurseServicesDTOs.NurseCreation;
@@ -9,7 +9,7 @@ namespace NurseRecordingSystem.API.Controllers
     // AdminNuresController.cs
     [Route("api/admin/nurse")]
     [ApiController]
-    // [Authorize(Roles = "Admin, SuperAdmin")] 
+    [Authorize(Policy = "MustBeNurse")]
     public class AdminNurseController : ControllerBase
     {
         private readonly ICreateNurse _createNurseService;
@@ -24,7 +24,6 @@ namespace NurseRecordingSystem.API.Controllers
         /// Creates a new Nurse account (Auth and Profile) with the role 'Nurse'.
         /// </summary>
         [HttpPost("register")]
-        //[Authorize(Policy = "MustBeNurse")]
         [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)] // For existing email
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
